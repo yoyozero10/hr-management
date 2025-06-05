@@ -7,6 +7,8 @@ const Tabs = () => (
     <NavLink to="/nhanvien" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Nhân viên</NavLink>
     <NavLink to="/chamcong" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Chấm công</NavLink>
     <NavLink to="/luong" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Lương</NavLink>
+    <NavLink to="/tuyendung" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Tuyển dụng</NavLink>
+    <NavLink to="/danhgia" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Đánh giá</NavLink>
   </div>
 );
 
