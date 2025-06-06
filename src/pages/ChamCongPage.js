@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllChamCong } from '../api/chamcongApi';
+import { getAllChamCong, modifyChamCong } from '../api/chamcongApi';
 import { getEmployees } from '../api/employeeApi';
 
 const tableStyle = {
@@ -218,20 +218,25 @@ const ChamCongPage = () => {
             <div style={{marginBottom: 12}}><b>{editData?.employee?.hoten}</b> ({editData?.employee?.manv})</div>
             <form onSubmit={async (e) => {
               e.preventDefault();
+              // Đảm bảo đúng định dạng cho API
+              const token = localStorage.getItem('token');
+              const id = Number(editData.id);
+              const employeeId = Number(editData.employeeId);
+              // timeStamp: lấy từ editData.ngay hoặc editData.timeStamp, format yyyy-MM-dd
+              const timeStamp = (editData.ngay || editData.timeStamp || '').slice(0, 10);
+              // gioVao/gioRa: luôn có dạng HH:mm:ss
+              const gioVao = editData.gioVao && editData.gioVao.length === 5 ? editData.gioVao + ':00' : (editData.gioVao || '');
+              const gioRa = editData.gioRa && editData.gioRa.length === 5 ? editData.gioRa + ':00' : (editData.gioRa || '');
               const body = {
-                token: "",
-                id: editData.id,
-                employeeId: editData.employeeId,
-                timeStamp: editData.ngay,
-                gioVao: editData.gioVao,
-                gioRa: editData.gioRa
+                token,
+                id,
+                employeeId,
+                timeStamp,
+                gioVao,
+                gioRa
               };
               try {
-                await fetch('https://doanjava-z61i.onrender.com/api/chamcong/modifierChamcong', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(body)
-                });
+                await modifyChamCong(body);
                 setEditOpen(false);
                 fetchData();
               } catch (err) {

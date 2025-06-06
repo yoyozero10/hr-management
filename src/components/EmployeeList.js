@@ -215,9 +215,46 @@ function EmployeeList({ onEdit, refresh }) {
               <td style={tdStyle}>{emp.dienthoai}</td>
               <td style={tdStyle}><span style={statusStyle}>Đang làm việc</span></td>
               <td style={tdStyle}>
-                <button style={actionBtn} title="Xem">&#128065;</button>
-                <button style={actionBtn} title="Sửa" onClick={() => openEditModal(emp)}>&#9998;</button>
-                <button style={{...actionBtn, color: '#e74c3c'}} title="Xóa" onClick={() => handleDelete(emp.manv || emp.id || emp.fid)}>&#128465;</button>
+                <button
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    color: '#222',
+                    fontSize: 18,
+                    marginRight: 12,
+                    cursor: 'pointer'
+                  }}
+                  title="Xem"
+                >
+                  &#128065;
+                </button>
+                <button
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    color: '#222',
+                    fontSize: 18,
+                    marginRight: 12,
+                    cursor: 'pointer'
+                  }}
+                  title="Sửa"
+                  onClick={() => openEditModal(emp)}
+                >
+                  &#9998;
+                </button>
+                <button
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    color: '#e57373',
+                    fontSize: 18,
+                    cursor: 'pointer'
+                  }}
+                  title="Xóa"
+                  onClick={() => handleDelete(emp.manv || emp.id || emp.fid)}
+                >
+                  &#128465;
+                </button>
               </td>
             </tr>
           ))}

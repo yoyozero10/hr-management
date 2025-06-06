@@ -34,6 +34,7 @@ const LuongPage = () => {
     setLoading(true);
     try {
       const res = await getAllPhieuLuong();
+      console.log('Dữ liệu phiếu lương nhận được:', res.data);
       setData(res.data.data || []);
     } catch (e) {
       alert('Lỗi khi lấy dữ liệu lương');
