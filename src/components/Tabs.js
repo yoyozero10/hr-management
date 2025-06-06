@@ -1,14 +1,57 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+const tabs = [
+  { path: '/', label: 'Dashboard' },
+  { path: '/phongban', label: 'Phòng ban' },
+  { path: '/nhanvien', label: 'Nhân viên' },
+  { path: '/chamcong', label: 'Chấm công' },
+  { path: '/luong', label: 'Lương' },
+  { path: '/tuyendung', label: 'Tuyển dụng' },
+  { path: '/danhgia', label: 'Đánh giá' },
+];
+
 const Tabs = () => (
-  <div style={{ display: 'flex', gap: 24, padding: '0 32px', borderBottom: '1px solid #eee', marginBottom: 16 }}>
-    <NavLink to="/" end style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Dashboard</NavLink>
-    <NavLink to="/nhanvien" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Nhân viên</NavLink>
-    <NavLink to="/chamcong" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Chấm công</NavLink>
-    <NavLink to="/luong" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Lương</NavLink>
-    <NavLink to="/tuyendung" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Tuyển dụng</NavLink>
-    <NavLink to="/danhgia" style={({ isActive }) => ({ color: isActive ? '#2962ff' : '#222', borderBottom: isActive ? '2px solid #2962ff' : 'none', padding: 8 })}>Đánh giá</NavLink>
+  <div style={{
+    display: 'flex',
+    gap: 32,
+    padding: '0 40px',
+    borderBottom: '2px solid #f0f0f0',
+    marginBottom: 18,
+    background: '#fff',
+    alignItems: 'center',
+    minHeight: 56
+  }}>
+    {tabs.map(tab => (
+      <NavLink
+        key={tab.path}
+        to={tab.path}
+        end={tab.path === '/'}
+        style={({ isActive, isPending }) => ({
+          color: isActive ? '#222' : '#222',
+          fontWeight: isActive ? 700 : 500,
+          textDecoration: 'none',
+          background: isActive ? '#f5f5f5' : 'none',
+          borderRadius: isActive ? 12 : 0,
+          padding: isActive ? '14px 28px' : '12px 20px',
+          fontSize: 18,
+          transition: 'all 0.2s',
+          border: 'none'
+        })}
+        onMouseOver={e => {
+          e.currentTarget.style.background = '#f5f5f5';
+          e.currentTarget.style.color = '#222';
+        }}
+        onMouseOut={e => {
+          if (!e.currentTarget.classList.contains('active')) {
+            e.currentTarget.style.background = 'none';
+            e.currentTarget.style.color = '#222';
+          }
+        }}
+      >
+        {tab.label}
+      </NavLink>
+    ))}
   </div>
 );
 
