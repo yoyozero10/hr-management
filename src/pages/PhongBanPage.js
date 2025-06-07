@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getAllPhongBan, addPhongBan, updatePhongBan, deletePhongBan } from '../api/phongbanApi';
+import { getEmployees } from '../api/employeeApi';
 
 const PhongBanPage = () => {
   const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -11,6 +13,7 @@ const PhongBanPage = () => {
 
   useEffect(() => {
     fetchDepartments();
+    fetchEmployees();
   }, []);
 
   const fetchDepartments = async () => {
@@ -26,6 +29,15 @@ const PhongBanPage = () => {
       alert('Lỗi khi tải danh sách phòng ban!');
     }
     setLoading(false);
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await getEmployees();
+      setEmployees(res.data.data || []);
+    } catch (e) {
+      // Có thể alert hoặc bỏ qua
+    }
   };
 
   const filtered = departments.filter(dep =>
@@ -104,7 +116,9 @@ const PhongBanPage = () => {
               <tr key={dep.id}>
                 <td style={{ padding: 12 }}>{dep.name}</td>
                 <td style={{ padding: 12 }}>{dep.truongphong || '-'}</td>
-                <td style={{ padding: 12, textAlign: 'center' }}>{dep.soluongnv !== undefined ? dep.soluongnv : '-'}</td>
+                <td style={{ padding: 12, textAlign: 'center' }}>{
+                  employees.filter(emp => String(emp.idpb) === String(dep.id)).length
+                }</td>
                 <td style={{ padding: 12, textAlign: 'center' }}>
                   <button onClick={() => { 
                     setEditData({

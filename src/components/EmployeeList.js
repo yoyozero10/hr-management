@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getEmployees, deleteEmployee } from '../api/employeeApi';
+import { getAllChucVu } from '../api/chucvuApi';
 
 const tableWrapper = {
   background: '#fff',
@@ -123,6 +124,7 @@ function getInitials(name) {
 
 function EmployeeList({ onEdit, refresh }) {
   const [employees, setEmployees] = useState([]);
+  const [chucVus, setChucVus] = useState([]);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [refreshLocal, setRefreshLocal] = useState(false);
@@ -130,15 +132,26 @@ function EmployeeList({ onEdit, refresh }) {
 
   useEffect(() => {
     fetchEmployees();
+    fetchChucVus();
     // eslint-disable-next-line
   }, [refresh, refreshLocal]);
 
   const fetchEmployees = async () => {
     try {
       const res = await getEmployees();
+      console.log('API getEmployees trả về:', res.data);
       setEmployees(res.data.data || []);
     } catch (error) {
       alert('Lỗi khi lấy danh sách nhân viên');
+    }
+  };
+
+  const fetchChucVus = async () => {
+    try {
+      const res = await getAllChucVu();
+      setChucVus(res.data.data || []);
+    } catch (error) {
+      // Có thể alert hoặc bỏ qua
     }
   };
 
@@ -204,14 +217,22 @@ function EmployeeList({ onEdit, refresh }) {
         </thead>
         <tbody>
           {filtered.map(emp => (
-            <tr key={emp.manv || emp.id || emp.fid}>
-              <td style={tdStyle}>{emp.manv || ''}</td>
+            <tr key={emp.fid || emp.id || emp.manv}>
+              <td style={tdStyle}>{emp.fid || emp.id || emp.manv || ''}</td>
               <td style={{...tdStyle, textAlign: 'left'}}>
                 <span style={avatarStyle}>{getInitials(emp.hoten)}</span>
                 {emp.hoten}
               </td>
               <td style={tdStyle}>{emp.tenpb || emp.phongban || ''}</td>
-              <td style={tdStyle}>{emp.chucdanh || emp.tencv || ''}</td>
+              <td style={tdStyle}>
+                {
+                  (() => {
+                    // Lấy tên chức vụ từ danh sách chức vụ theo idcv
+                    const chucvu = chucVus.find(c => String(c.id) === String(emp.idcv));
+                    return chucvu ? chucvu.name : '';
+                  })()
+                }
+              </td>
               <td style={tdStyle}>{emp.dienthoai}</td>
               <td style={tdStyle}><span style={statusStyle}>Đang làm việc</span></td>
               <td style={tdStyle}>
