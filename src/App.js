@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PrivateRoute from './components/PrivateRoute';
 import PhongBanPage from './pages/PhongBanPage';
+import DanhGiaPage from './pages/DanhGiaPage';
 
 function AppContent() {
   const location = useLocation();
@@ -50,6 +51,11 @@ function AppContent() {
         <Route path="/phongban" element={
           <PrivateRoute>
             <PhongBanPage />
+          </PrivateRoute>
+        } />
+        <Route path="/danhgia" element={
+          <PrivateRoute>
+            <DanhGiaPage />
           </PrivateRoute>
         } />
       </Routes>
