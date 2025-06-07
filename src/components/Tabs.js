@@ -7,6 +7,7 @@ const tabs = [
   { path: '/nhanvien', label: 'Nhân viên' },
   { path: '/chamcong', label: 'Chấm công' },
   { path: '/luong', label: 'Lương' },
+  { path: '/baohiem', label: 'Bảo hiểm' },
   { path: '/tuyendung', label: 'Tuyển dụng' },
   { path: '/danhgia', label: 'Đánh giá' },
 ];
