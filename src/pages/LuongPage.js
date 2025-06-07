@@ -51,19 +51,29 @@ const LuongPage = () => {
             <tr>
               <th style={thStyle}>Mã phiếu</th>
               <th style={thStyle}>Mã NV</th>
+              <th style={thStyle}>Họ tên</th>
+              <th style={thStyle}>Giới tính</th>
               <th style={thStyle}>Tháng</th>
               <th style={thStyle}>Năm</th>
+              <th style={thStyle}>Lương cơ bản</th>
+              <th style={thStyle}>Bảo hiểm</th>
+              <th style={thStyle}>Phụ cấp</th>
               <th style={thStyle}>Tổng lương</th>
             </tr>
           </thead>
           <tbody>
             {data.map((row, idx) => (
-              <tr key={row.id || idx}>
-                <td style={tdStyle}>{row.id || ''}</td>
-                <td style={tdStyle}>{row.employeeId || ''}</td>
+              <tr key={row.luongId || idx}>
+                <td style={tdStyle}>{row.luongId || ''}</td>
+                <td style={tdStyle}>{row.nhanVien?.id || ''}</td>
+                <td style={tdStyle}>{row.nhanVien?.hoten || ''}</td>
+                <td style={tdStyle}>{row.nhanVien?.gioitinh || ''}</td>
                 <td style={tdStyle}>{row.thang || ''}</td>
                 <td style={tdStyle}>{row.nam || ''}</td>
-                <td style={tdStyle}>{row.tongLuong || row.tongluong || ''}</td>
+                <td style={tdStyle}>{row.luongCoBan || ''}</td>
+                <td style={tdStyle}>{row.baoHiem || ''}</td>
+                <td style={tdStyle}>{row.phuCap || ''}</td>
+                <td style={tdStyle}>{row.thuNhapThuc || ''}</td>
               </tr>
             ))}
           </tbody>
