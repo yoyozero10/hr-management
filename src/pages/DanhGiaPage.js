@@ -34,11 +34,11 @@ const initialForm = {
 const getPerformanceLevel = (diem) => {
   if (diem === undefined || diem === null || diem === '') return 'Chưa có';
   const d = parseFloat(diem);
-  if (d >= 0 && d <= 4.9) return 'Kém';
-  if (d >= 5 && d <= 6.9) return 'Trung bình';
-  if (d >= 7 && d <= 7.9) return 'Khá';
-  if (d >= 8 && d <= 8.9) return 'Tốt';
-  if (d >= 9 && d <= 10) return 'Xuất sắc';
+  if (d >= 0 && d <= 49) return 'Kém';
+  if (d >= 50 && d <= 69) return 'Trung bình';
+  if (d >= 70 && d <= 79) return 'Khá';
+  if (d >= 80 && d <= 89) return 'Tốt';
+  if (d >= 90 && d <= 100) return 'Xuất sắc';
   return 'Chưa có';
 };
 
@@ -140,7 +140,7 @@ const DanhGiaPage = () => {
     <div style={{ padding: 32 }}>
       {/* Biểu đồ hiệu suất */}
       <div style={{ background: '#fff', borderRadius: 12, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 32 }}>
-        <h3 style={{ margin: 0, marginBottom: 18 }}>Hiệu suất công việc (phân bố theo điểm)</h3>
+        <h3 style={{ margin: 0, marginBottom: 18 }}>Hiệu suất công việc</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -150,7 +150,6 @@ const DanhGiaPage = () => {
               cx="50%"
               cy="50%"
               outerRadius={100}
-              label={({ name, value }) => value > 0 ? `${name}: ${value}` : ''}
             >
               {pieData.map((entry, idx) => (
                 <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
@@ -187,7 +186,7 @@ const DanhGiaPage = () => {
           <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}>
             <option value="">Chọn nhân viên</option>
             {employees.map(emp => (
-              <option key={emp.id} value={emp.id}>{emp.hoten} ({emp.phongban})</option>
+              <option key={emp.id} value={emp.id}>{emp.hoten}{emp.phongban ? ` (${emp.phongban})` : ''}</option>
             ))}
           </select>
           <input name="diemSo" value={form.diemSo} onChange={handleChange} placeholder="Điểm" type="number" step="0.1" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 100 }} />
