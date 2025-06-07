@@ -1,22 +1,14 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
-const getToken = () => localStorage.getItem('token') || '';
+const API_URL = 'https://doanjava-z61i.onrender.com/api/danhgia';
+function getToken() {
+  return localStorage.getItem('token');
+}
 
-export const addDanhGia = ({ employeeId, ky, nam, diemSo, nhanXet }) =>
-  axios.post(`${API_URL}/api/danhgia/addDanhGia`, {
-    token: getToken(),
-    employeeId,
-    ky,
-    nam,
-    diemSo,
-    nhanXet,
-  });
+// Lấy tất cả đánh giá (có thể lọc theo employeeId, ky, nam)
+export const getAllDanhGia = (filter = {}) =>
+  axios.post(`${API_URL}/getAll`, { ...filter, token: getToken() });
 
-export const getAllDanhGia = ({ employeeId = 0, ky = 0, nam = 0 } = {}) =>
-  axios.post(`${API_URL}/api/danhgia/getAll`, {
-    token: getToken(),
-    employeeId,
-    ky,
-    nam,
-  }); 
+// Thêm mới đánh giá
+export const addDanhGia = (data) =>
+  axios.post(`${API_URL}/addDanhGia`, { ...data, token: getToken() }); 

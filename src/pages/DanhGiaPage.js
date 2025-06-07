@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import { getAllDanhGia, addDanhGia } from '../api/danhgiaApi';
 import { getEmployees } from '../api/employeeApi';
+import { getAllPhongBan } from '../api/phongbanApi';
 // TODO: Import API functions for Đánh giá when available
 
 const statusBadge = (type, text) => {
@@ -56,6 +57,7 @@ const getPieData = (evaluations) => {
 const DanhGiaPage = () => {
   const [evaluations, setEvaluations] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [phongbans, setPhongbans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
   const [adding, setAdding] = useState(false);
@@ -66,6 +68,7 @@ const DanhGiaPage = () => {
 
   useEffect(() => {
     fetchAll();
+    fetchPhongbans();
   }, []);
 
   const fetchAll = async () => {
@@ -75,12 +78,20 @@ const DanhGiaPage = () => {
         getEmployees(),
         getAllDanhGia({})
       ]);
+      console.log('API getAllDanhGia trả về:', evalRes.data);
       setEmployees(empRes.data.data || []);
       setEvaluations((evalRes.data.data || []).map(ev => ({ ...ev })));
     } catch (e) {
       setAddError('Lỗi khi tải dữ liệu đánh giá hoặc nhân viên!');
     }
     setLoading(false);
+  };
+
+  const fetchPhongbans = async () => {
+    try {
+      const res = await getAllPhongBan();
+      setPhongbans(res.data.data || []);
+    } catch (e) {}
   };
 
   const handleChange = e => {
@@ -191,6 +202,7 @@ const DanhGiaPage = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #f0f0f0', textAlign: 'left' }}>
+              <th style={{ padding: '12px 8px' }}>Mã NV</th>
               <th style={{ padding: '12px 8px' }}>Họ tên</th>
               <th style={{ padding: '12px 8px' }}>Phòng ban</th>
               <th style={{ padding: '12px 8px' }}>Điểm</th>
@@ -201,11 +213,11 @@ const DanhGiaPage = () => {
           </thead>
           <tbody>
             {filteredEvaluations.map((ev, idx) => {
-              const emp = getEmp(ev.employeeId);
               return (
                 <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', verticalAlign: 'middle' }}>
-                  <td style={{ padding: '16px 8px' }}>{emp.hoten || ev.employeeId}</td>
-                  <td style={{ padding: '16px 8px' }}>{emp.phongban || ''}</td>
+                  <td style={{ padding: '16px 8px' }}>{ev.nhanVien?.id || ''}</td>
+                  <td style={{ padding: '16px 8px' }}>{ev.nhanVien?.hoten || ''}</td>
+                  <td style={{ padding: '16px 8px' }}>{(() => { const pb = phongbans.find(p => String(p.id) === String(ev.nhanVien?.idpb)); return pb ? pb.tenpb || pb.name : ev.nhanVien?.idpb || ''; })()}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.diemSo}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.nhanXet}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.ky}</td>
