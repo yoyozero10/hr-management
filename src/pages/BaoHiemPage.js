@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getAllBaoHiem, getBaoHiemById, addBaoHiem, updateBaoHiem, deleteBaoHiem } from '../api/baoHiemApi';
+import { getEmployees } from '../api/employeeApi';
 
 const tableStyle = {
   width: '100%',
@@ -37,11 +38,17 @@ const BaoHiemPage = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
-  const [form, setForm] = useState({ ten: '', mucDong: '', ghiChu: '' });
+  const [form, setForm] = useState({ sobh: '', ngayCap: '', noiCap: '', noiKhamBenh: '', manv: '' });
   const [editId, setEditId] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [searchId, setSearchId] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   useEffect(() => {
     fetchData();
+    fetchEmployees();
   }, []);
 
   const fetchData = async () => {
@@ -56,8 +63,17 @@ const BaoHiemPage = () => {
     setLoading(false);
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const res = await getEmployees();
+      setEmployees(res.data.data || []);
+    } catch (e) {
+      // ignore
+    }
+  };
+
   const openAddModal = () => {
-    setForm({ ten: '', mucDong: '', ghiChu: '' });
+    setForm({ sobh: '', ngayCap: '', noiCap: '', noiKhamBenh: '', manv: '' });
     setModalType('add');
     setEditId(null);
     setModalOpen(true);
@@ -67,9 +83,11 @@ const BaoHiemPage = () => {
     try {
       const res = await getBaoHiemById(id);
       setForm({
-        ten: res.data.data.ten || '',
-        mucDong: res.data.data.mucDong || '',
-        ghiChu: res.data.data.ghiChu || ''
+        sobh: res.data.data.sobh || '',
+        ngayCap: res.data.data.ngayCap || '',
+        noiCap: res.data.data.noiCap || '',
+        noiKhamBenh: res.data.data.noiKhamBenh || '',
+        manv: res.data.data.nhanVien?.id || ''
       });
       setModalType('edit');
       setEditId(id);
@@ -91,11 +109,18 @@ const BaoHiemPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      sobh: form.sobh,
+      ngayCap: form.ngayCap,
+      noiCap: form.noiCap,
+      noiKhamBenh: form.noiKhamBenh,
+      manv: Number(form.manv)
+    };
     try {
       if (modalType === 'add') {
-        await addBaoHiem(form);
+        await addBaoHiem(payload);
       } else if (modalType === 'edit') {
-        await updateBaoHiem(editId, form);
+        await updateBaoHiem(editId, payload);
       }
       setModalOpen(false);
       fetchData();
@@ -104,16 +129,97 @@ const BaoHiemPage = () => {
     }
   };
 
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setSearchLoading(true);
+    setSearchError('');
+    setSearchResult(null);
+    try {
+      const res = await getBaoHiemById(searchId);
+      setSearchResult(res.data.data);
+      if (!res.data.data) setSearchError('Không tìm thấy bảo hiểm với ID này.');
+    } catch (e) {
+      setSearchError('Không tìm thấy bảo hiểm với ID này.');
+      setSearchResult(null);
+    }
+    setSearchLoading(false);
+  };
+
   return (
     <div style={{ padding: 32 }}>
       <h2>Quản lý Bảo hiểm</h2>
-      <button onClick={openAddModal} style={{ marginBottom: 16 }}>Thêm mới</button>
+      {/* Search box */}
+      <form onSubmit={handleSearch} style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <input
+          type="text"
+          placeholder="Tìm kiếm bảo hiểm theo ID..."
+          value={searchId}
+          onChange={e => setSearchId(e.target.value)}
+          style={{
+            padding: '10px 28px',
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            minWidth: 180,
+            fontSize: 16,
+            fontWeight: 600,
+            background: '#fff',
+            boxShadow: '0 2px 8px rgba(41,98,255,0.02)'
+          }}
+        />
+        <button
+          type="submit"
+          style={{
+            padding: '10px 28px',
+            borderRadius: 8,
+            background: '#2962ff',
+            color: '#fff',
+            border: 'none',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(41,98,255,0.08)'
+          }}
+        >
+          Tìm kiếm
+        </button>
+        {searchLoading && <span style={{ marginLeft: 12 }}>Đang tìm...</span>}
+      </form>
+      {searchError && <div style={{ color: 'red', marginBottom: 12 }}>{searchError}</div>}
+      {searchResult && (
+        <div style={{ background: '#f8fafd', borderRadius: 8, padding: 18, marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <h4 style={{ margin: 0, marginBottom: 8 }}>Kết quả tìm kiếm:</h4>
+          <div><b>ID:</b> {searchResult.idbh}</div>
+          <div><b>Số BH:</b> {searchResult.sobh}</div>
+          <div><b>Ngày cấp:</b> {searchResult.ngayCap}</div>
+          <div><b>Nơi cấp:</b> {searchResult.noiCap}</div>
+          <div><b>Nơi khám bệnh:</b> {searchResult.noiKhamBenh}</div>
+          <div><b>Mã NV:</b> {searchResult.nhanVien?.id}</div>
+          <div><b>Họ tên NV:</b> {searchResult.nhanVien?.hoten}</div>
+        </div>
+      )}
+      <button 
+        onClick={openAddModal} 
+        style={{ 
+          marginBottom: 16, 
+          background: '#2962ff', 
+          color: '#fff', 
+          border: 'none', 
+          borderRadius: 8, 
+          padding: '10px 28px', 
+          fontWeight: 600, 
+          fontSize: 16, 
+          cursor: 'pointer', 
+          boxShadow: '0 2px 8px rgba(41,98,255,0.08)'
+        }}
+      >
+        Thêm mới
+      </button>
       {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={tableStyle}>
           <thead>
             <tr>
               <th style={thStyle}>ID</th>
-              <th style={thStyle}>Số ĐBH</th>
+              <th style={thStyle}>Số BH</th>
               <th style={thStyle}>Ngày cấp</th>
               <th style={thStyle}>Nơi cấp</th>
               <th style={thStyle}>Nơi khám bệnh</th>
@@ -129,7 +235,7 @@ const BaoHiemPage = () => {
             {data.map((row) => (
               <tr key={row.idbh}>
                 <td style={tdStyle}>{row.idbh}</td>
-                <td style={tdStyle}>{row.sdbh}</td>
+                <td style={tdStyle}>{row.sobh}</td>
                 <td style={tdStyle}>{row.ngayCap}</td>
                 <td style={tdStyle}>{row.noiCap}</td>
                 <td style={tdStyle}>{row.noiKhamBenh}</td>
@@ -139,19 +245,6 @@ const BaoHiemPage = () => {
                 <td style={tdStyle}>{row.nhanVien?.ngaysinh}</td>
                 <td style={tdStyle}>{row.nhanVien?.dienthoai}</td>
                 <td style={tdStyle}>
-                  <button
-                    style={{
-                      border: 'none',
-                      background: 'none',
-                      color: '#222',
-                      fontSize: 18,
-                      marginRight: 12,
-                      cursor: 'pointer'
-                    }}
-                    title="Xem"
-                  >
-                    &#128065;
-                  </button>
                   <button
                     style={{
                       border: 'none',
@@ -191,16 +284,31 @@ const BaoHiemPage = () => {
             <h3>{modalType === 'add' ? 'Thêm mới' : 'Chỉnh sửa'} bảo hiểm</h3>
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: 12 }}>
-                <label>Tên bảo hiểm: </label>
-                <input value={form.ten} onChange={e => setForm({ ...form, ten: e.target.value })} required />
+                <label>Số BH: </label>
+                <input value={form.sobh} onChange={e => setForm({ ...form, sobh: e.target.value })} required />
               </div>
               <div style={{ marginBottom: 12 }}>
-                <label>Mức đóng: </label>
-                <input value={form.mucDong} onChange={e => setForm({ ...form, mucDong: e.target.value })} required />
+                <label>Ngày cấp: </label>
+                <input type="date" value={form.ngayCap} onChange={e => setForm({ ...form, ngayCap: e.target.value })} required />
               </div>
               <div style={{ marginBottom: 12 }}>
-                <label>Ghi chú: </label>
-                <input value={form.ghiChu} onChange={e => setForm({ ...form, ghiChu: e.target.value })} />
+                <label>Nơi cấp: </label>
+                <input value={form.noiCap} onChange={e => setForm({ ...form, noiCap: e.target.value })} required />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Nơi khám bệnh: </label>
+                <input value={form.noiKhamBenh} onChange={e => setForm({ ...form, noiKhamBenh: e.target.value })} required />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Nhân viên: </label>
+                <select value={form.manv} onChange={e => setForm({ ...form, manv: e.target.value })} required>
+                  <option value="">Chọn nhân viên</option>
+                  {employees.map(emp => (
+                    <option key={emp.id || emp.manv} value={emp.id || emp.manv}>
+                      {emp.hoten} ({emp.id || emp.manv})
+                    </option>
+                  ))}
+                </select>
               </div>
               <button type="submit">Lưu</button>
               <button type="button" onClick={() => setModalOpen(false)} style={{ marginLeft: 8 }}>Hủy</button>
