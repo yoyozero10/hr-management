@@ -223,16 +223,8 @@ function EmployeeList({ onEdit, refresh }) {
                 <span style={avatarStyle}>{getInitials(emp.hoten)}</span>
                 {emp.hoten}
               </td>
-              <td style={tdStyle}>{emp.tenpb || emp.phongban || ''}</td>
-              <td style={tdStyle}>
-                {
-                  (() => {
-                    // Lấy tên chức vụ từ danh sách chức vụ theo idcv
-                    const chucvu = chucVus.find(c => String(c.id) === String(emp.idcv));
-                    return chucvu ? chucvu.name : '';
-                  })()
-                }
-              </td>
+              <td style={tdStyle}>{emp.phongBan?.name || ''}</td>
+              <td style={tdStyle}>{emp.chucVu?.name || ''}</td>
               <td style={tdStyle}>{emp.dienthoai}</td>
               <td style={tdStyle}><span style={statusStyle}>Đang làm việc</span></td>
               <td style={tdStyle}>

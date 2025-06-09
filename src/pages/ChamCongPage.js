@@ -55,6 +55,7 @@ const ChamCongPage = () => {
         getAllChamCong(),
         getEmployees()
       ]);
+      console.log('Dữ liệu chấm công trả về:', chamCongRes.data);
       setData(chamCongRes.data.data || []);
       setEmployees(empRes.data.data || []);
     } catch (e) {
@@ -64,8 +65,14 @@ const ChamCongPage = () => {
     setLoading(false);
   };
 
-  // Tìm bản ghi chấm công theo mã nhân viên
-  const findChamCong = (manv) => data.find(row => row.employeeId === manv || row.employeeId === String(manv));
+  // Tìm bản ghi chấm công theo mã nhân viên và ngày lọc
+  const findChamCong = (manv) => {
+    return data.find(row => {
+      const matchId = row.employeeId === manv || row.employeeId === String(manv);
+      const matchDate = filterDate ? row.ngay === filterDate : true;
+      return matchId && matchDate;
+    });
+  };
 
   // Tính số giờ làm
   const calcWorkingHours = (gioVao, gioRa) => {
@@ -158,16 +165,18 @@ const ChamCongPage = () => {
           </thead>
           <tbody>
             {filteredEmployees.map((emp, idx) => {
-              const chamCong = data.find(row => {
-                if (row.employeeId !== (emp.manv || emp.id && String(row.employeeId) !== String(emp.manv || emp.id))) return false;
-                if (filterDate) {
-                  // So sánh ngày, chấp nhận cả timeStamp hoặc ngay
-                  const rowDate = row.timeStamp || row.ngay;
-                  return rowDate === filterDate;
+              const chamCong = findChamCong(emp.manv || emp.id) || {};
+              let workingHours =
+                chamCong.gioVao && chamCong.gioRa
+                  ? calcWorkingHours(chamCong.gioVao, chamCong.gioRa)
+                  : (chamCong.soGioLam || '-');
+              // Nếu là số giờ tính được, trừ đi 1h nghỉ ngơi (nếu lớn hơn 1h)
+              if (chamCong.gioVao && chamCong.gioRa && typeof workingHours === 'string' && workingHours.endsWith('h')) {
+                const num = parseFloat(workingHours);
+                if (!isNaN(num) && num > 1) {
+                  workingHours = (num - 1).toFixed(2) + 'h';
                 }
-                return true;
-              }) || {};
-              const workingHours = calcWorkingHours(chamCong.gioVao, chamCong.gioRa);
+              }
               const status = getStatus(chamCong.gioVao, chamCong.gioRa);
               return (
                 <tr key={emp.manv || emp.id || idx}>

@@ -117,7 +117,7 @@ const PhongBanPage = () => {
                 <td style={{ padding: 12 }}>{dep.name}</td>
                 <td style={{ padding: 12 }}>{dep.truongphong || '-'}</td>
                 <td style={{ padding: 12, textAlign: 'center' }}>{
-                  employees.filter(emp => String(emp.idpb) === String(dep.id)).length
+                  employees.filter(emp => emp.phongBan && String(emp.phongBan.id) === String(dep.id)).length
                 }</td>
                 <td style={{ padding: 12, textAlign: 'center' }}>
                   <button onClick={() => { 
