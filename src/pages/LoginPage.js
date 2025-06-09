@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -25,6 +26,14 @@ const LoginPage = () => {
       const token = res.data.token;
       if (token) {
         localStorage.setItem('token', token);
+        // Giải mã JWT và lưu user với role chuẩn
+        const payload = jwtDecode(token);
+        let appRole = '';
+        if (payload.roles?.includes('ROLE_ADMIN')) appRole = 'admin';
+        else if (payload.roles?.includes('ROLE_USER')) appRole = 'user';
+        else if (payload.roles?.includes('ROLE_MANAGER')) appRole = 'manager';
+        const user = { ...payload, role: appRole };
+        localStorage.setItem('user', JSON.stringify(user));
         navigate('/');
       } else {
         setError('Đăng nhập thất bại!');

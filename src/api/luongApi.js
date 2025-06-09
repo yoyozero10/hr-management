@@ -7,7 +7,21 @@ function getToken() {
 }
 
 // Lấy tất cả phiếu lương
-export const getAllPhieuLuong = () => axios.post(`${API_URL}/getAllPhieuLuong`, { token: getToken() });
+export const getAllPhieuLuong = () => {
+  const token = getToken();
+  return axios.post(
+    `${API_URL}/getAllPhieuLuong`,
+    { token },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
 
 // Lấy phiếu lương có lọc
-export const getFilteredPhieuLuong = (filter) => axios.post(`${API_URL}/getFilteredPhieuLuong`, { ...filter, token: getToken() }); 
+export const getFilteredPhieuLuong = (filter) => {
+  const token = getToken();
+  return axios.post(
+    `${API_URL}/getFilteredPhieuLuong`,
+    { ...filter, token },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+}; 
