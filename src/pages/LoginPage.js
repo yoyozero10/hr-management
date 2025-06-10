@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { API_BASE_URL } from '../config';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -19,7 +20,7 @@ const LoginPage = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('https://doanjava-z61i.onrender.com/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, {
         username: form.username,
         password: form.password
       });

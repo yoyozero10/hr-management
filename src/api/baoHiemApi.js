@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-const API_BASE = 'https://doanjava-z61i.onrender.com/api/baohiem';
+const API_BASE = `${API_BASE_URL}/baohiem`;
 
 function authHeaders() {
   const token = localStorage.getItem('token');

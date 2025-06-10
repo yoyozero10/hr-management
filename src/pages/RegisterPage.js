@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -23,7 +24,7 @@ const RegisterPage = () => {
     setError('');
     setSuccess('');
     try {
-      await axios.post('https://doanjava-z61i.onrender.com/api/auth/register', {
+      await axios.post(`${API_BASE_URL}/auth/register`, {
         username: form.username,
         password: form.password,
         email: form.email,

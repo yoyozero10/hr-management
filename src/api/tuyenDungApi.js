@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-const API_URL = 'https://doanjava-z61i.onrender.com/api/tuyendung';
+const API_URL = `${API_BASE_URL}/tuyendung`;
 
 function getToken() {
   return localStorage.getItem('token');
