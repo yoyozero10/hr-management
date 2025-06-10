@@ -93,8 +93,8 @@ const PhongBanPage = () => {
         />
         <button
           style={{
-            background: '#2962ff', color: '#fff', border: 'none', borderRadius: 6,
-            padding: '8px 24px', fontWeight: 600, fontSize: 15, cursor: 'pointer'
+            background: '#111', color: '#fff', border: 'none', borderRadius: 6,
+            padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer'
           }}
           onClick={() => { setEditData({ tenpb: '', truongphong: '', soluongnv: 0 }); setModalOpen(true); }}
         >
@@ -128,8 +128,8 @@ const PhongBanPage = () => {
                       soluongnv: dep.soluongnv !== undefined ? dep.soluongnv : ''
                     });
                     setModalOpen(true); 
-                  }} style={{ marginRight: 8 }}>Sửa</button>
-                  <button onClick={() => handleDelete(dep.id)} style={{ color: '#e53935' }}>Xóa</button>
+                  }} style={{ marginRight: 8, border: '1px solid #ccc', borderRadius: 6, padding: '4px 12px', background: '#fff', color: '#222', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Sửa</button>
+                  <button onClick={() => handleDelete(dep.id)} style={{ color: '#e57373', border: '1px solid #ccc', borderRadius: 6, padding: '4px 12px', background: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Xóa</button>
                 </td>
               </tr>
             ))}
@@ -174,8 +174,8 @@ const PhongBanPage = () => {
                 />
               </div>
               <div style={{ marginTop: 16, textAlign: 'right' }}>
-                <button type="button" onClick={() => setModalOpen(false)} style={{ marginRight: 8 }}>Hủy</button>
-                <button type="submit" disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</button>
+                <button type="button" onClick={() => setModalOpen(false)} style={{ marginRight: 8, border: '1px solid #ccc', borderRadius: 6, padding: '4px 12px', background: '#fff', color: '#222', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Hủy</button>
+                <button type="submit" disabled={saving} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{saving ? 'Đang lưu...' : 'Lưu'}</button>
               </div>
             </form>
           </div>

@@ -129,7 +129,7 @@ const TuyenDungPage = () => {
           <input name="dienthoai" value={form.dienthoai} onChange={handleChange} placeholder="Điện thoại" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 120 }} />
           <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
           <input name="vitri" value={form.vitri} onChange={handleChange} placeholder="Vị trí ứng tuyển" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 160 }} />
-          <button type="submit" disabled={adding} style={{ background: '#2962ff', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 24px', fontWeight: 500, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm ứng viên'}</button>
+          <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm ứng viên'}</button>
           {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
           {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
         </form>
@@ -172,51 +172,50 @@ const TuyenDungPage = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                     <button
                       style={{
-                        border: '1px solid #222',
+                        border: '1px solid #ccc',
+                        borderRadius: 6,
+                        padding: '4px 12px',
                         background: '#fff',
-                        borderRadius: '50%',
-                        width: 36,
-                        height: 36,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        fontSize: 18,
                         color: '#222',
-                        padding: 0
+                        fontSize: 16,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginRight: 8
                       }}
                       title="Xem"
                     >
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#222"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{ display: 'block', margin: 'auto' }}
-                      >
-                        <ellipse cx="12" cy="12" rx="9" ry="6" />
-                        <circle cx="12" cy="12" r="2.5" fill="#222" />
-                      </svg>
+                      Xem
                     </button>
                     <button
                       style={{
-                        border: '1px solid #222',
+                        border: '1px solid #ccc',
+                        borderRadius: 6,
+                        padding: '4px 12px',
                         background: '#fff',
                         color: '#222',
-                        borderRadius: 8,
-                        padding: '0 18px',
-                        height: 36,
-                        fontWeight: 500,
                         fontSize: 16,
-                        cursor: 'pointer'
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginRight: 8
                       }}
                       title="Phỏng vấn"
                     >
                       Phỏng vấn
+                    </button>
+                    <button
+                      style={{
+                        border: '1px solid #ccc',
+                        borderRadius: 6,
+                        padding: '4px 12px',
+                        background: '#fff',
+                        color: '#e57373',
+                        fontSize: 16,
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                      title="Xóa"
+                    >
+                      Xóa
                     </button>
                   </div>
                 </td>

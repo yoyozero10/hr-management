@@ -193,7 +193,7 @@ const DanhGiaPage = () => {
           <input name="nhanXet" value={form.nhanXet} onChange={handleChange} placeholder="Nhận xét" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
           <input name="ky" value={form.ky} onChange={handleChange} placeholder="Kỳ" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
           <input name="nam" value={form.nam} onChange={handleChange} placeholder="Năm" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
-          <button type="submit" disabled={adding} style={{ background: '#2962ff', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 24px', fontWeight: 500, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm đánh giá'}</button>
+          <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm đánh giá'}</button>
           {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
           {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
         </form>

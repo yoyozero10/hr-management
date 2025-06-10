@@ -95,8 +95,8 @@ const RegisterPage = () => {
           type="submit"
           disabled={loading}
           style={{
-            background: '#2962ff', color: '#fff', border: 'none', borderRadius: 6,
-            padding: '12px 0', fontWeight: 600, fontSize: 16, cursor: 'pointer'
+            background: '#111', color: '#fff', border: 'none', borderRadius: 6,
+            padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer'
           }}
         >
           {loading ? 'Đang đăng ký...' : 'Đăng ký'}

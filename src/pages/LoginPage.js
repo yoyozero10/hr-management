@@ -136,40 +136,29 @@ const StyledWrapper = styled.div`
     gap: 5px;
     width: 250px;
     height: 40px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
+    border-radius: 6px;
+    border: none;
+    background: #111;
     font-size: 16px;
     font-weight: 600;
-    color: var(--font-color);
+    color: #fff;
     cursor: pointer;
     transition: all 250ms;
     position: relative;
     overflow: hidden;
     z-index: 1;
+    box-shadow: none;
   }
   .oauthButton:disabled {
     opacity: 0.7;
     cursor: not-allowed;
   }
   .oauthButton::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 0;
-    background-color: #212121;
-    z-index: -1;
-    box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
-    transition: all 250ms;
+    display: none;
   }
   .oauthButton:hover {
-    color: #e8e8e8;
-  }
-  .oauthButton:hover::before {
-    width: 100%;
+    color: #fff;
+    background: #222;
   }
   .error-message {
     color: red;

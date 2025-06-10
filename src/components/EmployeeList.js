@@ -197,7 +197,7 @@ function EmployeeList({ onEdit, refresh }) {
           onChange={e => setSearch(e.target.value)}
         />
         <button style={addBtn} onClick={openAddModal}>
-          <span style={{fontSize: 20, marginRight: 6}}>+</span> Thêm nhân viên
+          Thêm nhân viên
         </button>
       </div>
       {modalEmployee !== null && <EmployeeModal />}

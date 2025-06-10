@@ -142,7 +142,7 @@ const ChamCongPage = () => {
         </div>
         <button
           style={{
-            background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, cursor: 'pointer', marginTop: 22
+            background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginTop: 22
           }}
           onClick={() => {}} // Lọc realtime nên không cần làm gì
         >

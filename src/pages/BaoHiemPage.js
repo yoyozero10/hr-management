@@ -169,15 +169,14 @@ const BaoHiemPage = () => {
         <button
           type="submit"
           style={{
-            padding: '10px 28px',
-            borderRadius: 8,
-            background: '#2962ff',
+            background: '#111',
             color: '#fff',
             border: 'none',
+            borderRadius: 6,
+            padding: '8px 20px',
             fontWeight: 600,
             fontSize: 16,
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(41,98,255,0.08)'
           }}
         >
           Tìm kiếm
@@ -201,15 +200,14 @@ const BaoHiemPage = () => {
         onClick={openAddModal} 
         style={{ 
           marginBottom: 16, 
-          background: '#2962ff', 
-          color: '#fff', 
-          border: 'none', 
-          borderRadius: 8, 
-          padding: '10px 28px', 
-          fontWeight: 600, 
-          fontSize: 16, 
-          cursor: 'pointer', 
-          boxShadow: '0 2px 8px rgba(41,98,255,0.08)'
+          background: '#111',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          padding: '8px 20px',
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: 'pointer'
         }}
       >
         Thêm mới
@@ -247,30 +245,36 @@ const BaoHiemPage = () => {
                 <td style={tdStyle}>
                   <button
                     style={{
-                      border: 'none',
-                      background: 'none',
+                      border: '1px solid #ccc',
+                      borderRadius: 6,
+                      padding: '4px 12px',
+                      background: '#fff',
                       color: '#222',
-                      fontSize: 18,
-                      marginRight: 12,
-                      cursor: 'pointer'
+                      fontSize: 16,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      marginRight: 8
                     }}
                     title="Sửa"
                     onClick={() => openEditModal(row.idbh)}
                   >
-                    &#9998;
+                    Sửa
                   </button>
                   <button
                     style={{
-                      border: 'none',
-                      background: 'none',
+                      border: '1px solid #ccc',
+                      borderRadius: 6,
+                      padding: '4px 12px',
+                      background: '#fff',
                       color: '#e57373',
-                      fontSize: 18,
+                      fontSize: 16,
+                      fontWeight: 600,
                       cursor: 'pointer'
                     }}
                     title="Xóa"
                     onClick={() => handleDelete(row.idbh)}
                   >
-                    &#128465;
+                    Xóa
                   </button>
                 </td>
               </tr>
@@ -310,8 +314,27 @@ const BaoHiemPage = () => {
                   ))}
                 </select>
               </div>
-              <button type="submit">Lưu</button>
-              <button type="button" onClick={() => setModalOpen(false)} style={{ marginLeft: 8 }}>Hủy</button>
+              <button type="submit" style={{
+                background: '#111',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 6,
+                padding: '8px 20px',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer'
+              }}>Lưu</button>
+              <button type="button" onClick={() => setModalOpen(false)} style={{
+                marginLeft: 8,
+                border: '1px solid #ccc',
+                borderRadius: 6,
+                padding: '4px 12px',
+                background: '#fff',
+                color: '#222',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}>Hủy</button>
             </form>
           </div>
         </div>
