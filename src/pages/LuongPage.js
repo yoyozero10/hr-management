@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPhieuLuong } from '../api/luongApi';
+import { getAllPhieuLuong, getFilteredPhieuLuong } from '../api/luongApi';
+import { getEmployees } from '../api/employeeApi';
 
 const tableStyle = {
   width: '100%',
@@ -25,9 +26,14 @@ const tdStyle = {
 const LuongPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [employees, setEmployees] = useState([]);
+  const [employeeId, setEmployeeId] = useState(0);
+  const [thang, setThang] = useState(0);
+  const [nam, setNam] = useState(0);
 
   useEffect(() => {
     fetchData();
+    fetchEmployees();
   }, []);
 
   const fetchData = async () => {
@@ -42,9 +48,65 @@ const LuongPage = () => {
     setLoading(false);
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const res = await getEmployees();
+      setEmployees(res.data.data || []);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await getFilteredPhieuLuong({ employeeId, thang, nam });
+      setData(res.data.data || []);
+    } catch (e) {
+      alert('Lỗi khi lọc dữ liệu lương');
+    }
+    setLoading(false);
+  };
+
+  const handleClearFilters = () => {
+    setEmployeeId(0);
+    setThang(0);
+    setNam(0);
+    fetchData();
+  };
+
   return (
     <div style={{ padding: 32 }}>
       <h2>Bảng lương</h2>
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
+        <select value={employeeId} onChange={e => setEmployeeId(Number(e.target.value))} style={{ padding: 8, borderRadius: 6 }}>
+          <option value={0}>Tất cả nhân viên</option>
+          {employees.map(emp => (
+            <option key={emp.id} value={emp.id}>{emp.hoten}</option>
+          ))}
+        </select>
+        <input
+          type="number"
+          min={1}
+          max={12}
+          placeholder="Tháng"
+          value={thang === 0 ? '' : thang}
+          onChange={e => setThang(Number(e.target.value) || 0)}
+          style={{ padding: 8, borderRadius: 6, width: 80 }}
+        />
+        <input
+          type="number"
+          min={2000}
+          max={2100}
+          placeholder="Năm"
+          value={nam === 0 ? '' : nam}
+          onChange={e => setNam(Number(e.target.value) || 0)}
+          style={{ padding: 8, borderRadius: 6, width: 100 }}
+        />
+        <button type="submit" style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Tìm kiếm</button>
+        <button type="button" onClick={handleClearFilters} style={{ padding: '8px 20px', borderRadius: 6, background: '#eee', color: '#222', fontWeight: 600, fontSize: 16, border: 'none', cursor: 'pointer' }}>Xóa lọc</button>
+      </form>
       {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={tableStyle}>
           <thead>
