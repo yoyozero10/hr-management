@@ -13,3 +13,4 @@ export const getBaoHiemById = (id) => axios.get(`${API_BASE}/getById/${id}`, { h
 export const addBaoHiem = (data) => axios.post(`${API_BASE}/addBaoHiem`, data, { headers: authHeaders() });
 export const updateBaoHiem = (id, data) => axios.put(`${API_BASE}/updateBaoHiem/${id}`, data, { headers: authHeaders() });
 export const deleteBaoHiem = (id) => axios.delete(`${API_BASE}/deleteBaoHiem/${id}`, { headers: authHeaders() }); 
+
