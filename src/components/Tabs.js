@@ -24,7 +24,7 @@ const Tabs = () => {
   return (
     <div style={{
       display: 'flex',
-      gap: 32,
+      gap: 21,
       padding: '0 40px',
       borderBottom: '2px solid #f0f0f0',
       marginBottom: 18,
