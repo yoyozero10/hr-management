@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllBaoHiem, getBaoHiemById, addBaoHiem, updateBaoHiem, deleteBaoHiem } from '../api/baoHiemApi';
 import { getEmployees } from '../api/employeeApi';
+import { MdEdit, MdDelete } from 'react-icons/md';
 
 const tableStyle = {
   width: '100%',
@@ -245,36 +246,36 @@ const BaoHiemPage = () => {
                 <td style={tdStyle}>
                   <button
                     style={{
-                      border: '1px solid #ccc',
-                      borderRadius: 6,
-                      padding: '4px 12px',
-                      background: '#fff',
+                      border: 'none',
+                      background: 'none',
                       color: '#222',
-                      fontSize: 16,
-                      fontWeight: 600,
+                      fontSize: 20,
                       cursor: 'pointer',
-                      marginRight: 8
+                      marginRight: 8,
+                      padding: 4,
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
                     }}
                     title="Sửa"
                     onClick={() => openEditModal(row.idbh)}
                   >
-                    Sửa
+                    <MdEdit />
                   </button>
                   <button
                     style={{
-                      border: '1px solid #ccc',
-                      borderRadius: 6,
-                      padding: '4px 12px',
-                      background: '#fff',
+                      border: 'none',
+                      background: 'none',
                       color: '#e57373',
-                      fontSize: 16,
-                      fontWeight: 600,
-                      cursor: 'pointer'
+                      fontSize: 20,
+                      cursor: 'pointer',
+                      padding: 4,
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
                     }}
                     title="Xóa"
                     onClick={() => handleDelete(row.idbh)}
                   >
-                    Xóa
+                    <MdDelete />
                   </button>
                 </td>
               </tr>
