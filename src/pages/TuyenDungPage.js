@@ -45,6 +45,7 @@ const TuyenDungPage = () => {
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
 
   const fetchData = async () => {
@@ -103,11 +104,18 @@ const TuyenDungPage = () => {
         <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
           <input
             type="text"
-            placeholder="Tìm kiếm ứng viên..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+            placeholder="Tìm kiếm ứng viên"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
             style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 220 }}
           />
+          <button
+            type="button"
+            style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
+            onClick={() => setSearch(searchInput)}
+          >
+            Tìm kiếm
+          </button>
         </div>
         {/* Form thêm ứng viên */}
         <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -121,27 +129,27 @@ const TuyenDungPage = () => {
           {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
         </form>
         {loading ? <div>Đang tải dữ liệu...</div> : error ? <div style={{color:'red'}}>{error}</div> : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', tableLayout: 'fixed' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #f0f0f0', textAlign: 'left' }}>
-              <th style={{ padding: '12px 8px' }}>Ứng viên</th>
-              <th style={{ padding: '12px 8px' }}>Vị trí</th>
-              <th style={{ padding: '12px 8px' }}>Liên hệ</th>
-              <th style={{ padding: '12px 8px' }}>Trạng thái</th>
+              <th style={{ padding: '12px 8px', width: '25%' }}>Ứng viên</th>
+              <th style={{ padding: '12px 8px', width: '20%' }}>Vị trí</th>
+              <th style={{ padding: '12px 8px', width: '30%' }}>Liên hệ</th>
+              <th style={{ padding: '16px 12px', width: '15%'}}>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
             {filteredCandidates.map((c, idx) => (
               <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', verticalAlign: 'middle' }}>
-                <td style={{ padding: '16px 8px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ background: '#f2f4f8', color: '#222', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18 }}>{c.initials || (c.name ? c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : (c.hoten ? c.hoten.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : ''))}</span>
+                <td style={{ padding: '16px 8px', display: 'flex', alignItems: 'center', gap: 12, width: '25%' }}>
+                  <span style={{ background: '#f2f4f8', color: '#222', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, flexShrink: 0 }}>{c.initials || (c.name ? c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : (c.hoten ? c.hoten.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : ''))}</span>
                   <div>
-                    <div style={{ fontWeight: 600 }}>{c.name || c.hoten}</div>
-                    <div style={{ color: '#888', fontSize: 13 }}>{c.dob || c.ngaysinh}</div>
+                    <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{c.name || c.hoten}</div>
+                    <div style={{ color: '#888', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{c.dob || c.ngaysinh}</div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 8px' }}>{c.position || c.vitriungtuyen || c.vitri}</td>
-                <td style={{ padding: '16px 8px' }}>
+                <td style={{ padding: '16px 8px', width: '20%' }}>{c.position || c.vitriungtuyen || c.vitri}</td>
+                <td style={{ padding: '16px 8px', width: '30%' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span role="img" aria-label="phone">📞</span> {c.phone || c.sdt || c.dienthoai}
                   </div>
@@ -149,7 +157,9 @@ const TuyenDungPage = () => {
                     <span role="img" aria-label="email">✉️</span> {c.email}
                   </div>
                 </td>
-                <td style={{ padding: '16px 8px' }}>{statusBadge(getStatusType(c.status || c.trangthai), c.status || c.trangthai)}</td>
+                <td style={{ padding: '16px 12px', width: '15%'}}>
+                  {statusBadge(getStatusType(c.status || c.trangthai), c.status || c.trangthai)}
+                </td>
               </tr>
             ))}
           </tbody>
