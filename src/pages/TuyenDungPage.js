@@ -45,7 +45,6 @@ const TuyenDungPage = () => {
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [search, setSearch] = useState('');
 
   const fetchData = async () => {
@@ -92,7 +91,6 @@ const TuyenDungPage = () => {
   };
 
   const filteredCandidates = candidates.filter(c => {
-    if (filterStatus !== 'all' && (c.status || c.trangthai) !== filterStatus) return false;
     if (search && !(c.hoten || c.name || '').toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -110,17 +108,6 @@ const TuyenDungPage = () => {
             onChange={e => setSearch(e.target.value)}
             style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 220 }}
           />
-          <select
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="Đang xét duyệt">Đang xét duyệt</option>
-            <option value="Phỏng vấn">Phỏng vấn</option>
-            <option value="Đã tuyển">Đã tuyển</option>
-            <option value="Từ chối">Từ chối</option>
-          </select>
         </div>
         {/* Form thêm ứng viên */}
         <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -140,10 +127,7 @@ const TuyenDungPage = () => {
               <th style={{ padding: '12px 8px' }}>Ứng viên</th>
               <th style={{ padding: '12px 8px' }}>Vị trí</th>
               <th style={{ padding: '12px 8px' }}>Liên hệ</th>
-              <th style={{ padding: '12px 8px' }}>Kinh nghiệm</th>
-              <th style={{ padding: '12px 8px' }}>Ngày ứng tuyển</th>
               <th style={{ padding: '12px 8px' }}>Trạng thái</th>
-              <th style={{ padding: '12px 8px' }}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -165,60 +149,7 @@ const TuyenDungPage = () => {
                     <span role="img" aria-label="email">✉️</span> {c.email}
                   </div>
                 </td>
-                <td style={{ padding: '16px 8px' }}>{c.exp || c.kinhnghiem}</td>
-                <td style={{ padding: '16px 8px' }}>{c.applyDate || c.ngayungtuyen}</td>
                 <td style={{ padding: '16px 8px' }}>{statusBadge(getStatusType(c.status || c.trangthai), c.status || c.trangthai)}</td>
-                <td style={{ padding: '16px 8px', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                    <button
-                      style={{
-                        border: '1px solid #ccc',
-                        borderRadius: 6,
-                        padding: '4px 12px',
-                        background: '#fff',
-                        color: '#222',
-                        fontSize: 16,
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginRight: 8
-                      }}
-                      title="Xem"
-                    >
-                      Xem
-                    </button>
-                    <button
-                      style={{
-                        border: '1px solid #ccc',
-                        borderRadius: 6,
-                        padding: '4px 12px',
-                        background: '#fff',
-                        color: '#222',
-                        fontSize: 16,
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginRight: 8
-                      }}
-                      title="Phỏng vấn"
-                    >
-                      Phỏng vấn
-                    </button>
-                    <button
-                      style={{
-                        border: '1px solid #ccc',
-                        borderRadius: 6,
-                        padding: '4px 12px',
-                        background: '#fff',
-                        color: '#e57373',
-                        fontSize: 16,
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                      title="Xóa"
-                    >
-                      Xóa
-                    </button>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>
