@@ -22,7 +22,7 @@ const Tabs = () => {
   const visibleTabs = tabs.filter(tab => tab.roles.includes(userRole));
 
   return (
-    <div style={{
+    <div className="tabs" style={{
       display: 'flex',
       gap: 21,
       padding: '0 40px',
@@ -37,7 +37,8 @@ const Tabs = () => {
           key={tab.path}
           to={tab.path}
           end={tab.path === '/'}
-          style={({ isActive, isPending }) => ({
+          className={({ isActive }) => isActive ? 'tab-active' : 'tab'}
+          style={({ isActive }) => ({
             color: isActive ? '#222' : '#222',
             fontWeight: isActive ? 700 : 500,
             textDecoration: 'none',
@@ -56,7 +57,7 @@ const Tabs = () => {
             e.currentTarget.style.color = '#222';
           }}
           onMouseOut={e => {
-            if (!e.currentTarget.classList.contains('active')) {
+            if (!e.currentTarget.classList.contains('tab-active')) {
               e.currentTarget.style.background = 'none';
               e.currentTarget.style.color = '#222';
             }

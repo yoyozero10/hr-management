@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MdGroups } from 'react-icons/md';
 import { FiSettings, FiLogOut } from 'react-icons/fi';
 import { FaUserCircle } from 'react-icons/fa';
+import Switch from './ThemeToggle';
 
 const AccountMenu = ({ onLogout, username }) => {
   const [open, setOpen] = useState(false);
@@ -132,7 +133,10 @@ const Navbar = () => {
         </div>
       </div>
       <div style={{ flex: 1 }} />
-      <AccountMenu onLogout={handleLogout} username={username} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <Switch />
+        <AccountMenu onLogout={handleLogout} username={username} />
+      </div>
     </nav>
   );
 };

@@ -13,6 +13,7 @@ import PrivateRoute from './components/PrivateRoute';
 import PhongBanPage from './pages/PhongBanPage';
 import DanhGiaPage from './pages/DanhGiaPage';
 import BaoHiemPage from './pages/BaoHiemPage';
+import Switch from './components/ThemeToggle';
 
 function AppContent() {
   const location = useLocation();

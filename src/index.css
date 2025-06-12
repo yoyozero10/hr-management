@@ -11,3 +11,93 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body.dark-mode {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .navbar, body.dark-mode .tabs {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+body.dark-mode div, body.dark-mode table, body.dark-mode th, body.dark-mode td {
+  background-color: #23272f !important;
+  color: #e4e6eb !important;
+}
+
+body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
+  background-color: #333 !important;
+  color: #fff !important;
+  border-color: #666 !important;
+}
+
+body.dark-mode button {
+  background-color: #444 !important;
+  color: #fff !important;
+  border-color: #666 !important;
+}
+
+body.dark-mode span[style*='background: #f2f4f8'] {
+  background: #444 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .navbar, body.dark-mode nav, body.dark-mode .App-header {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  border-bottom: 1px solid #333 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+}
+
+body.dark-mode .navbar .logo, body.dark-mode .navbar .title {
+  color: #fff !important;
+}
+
+body.dark-mode .navbar .subtitle, body.dark-mode nav .subtitle {
+  color: #b0b3b8 !important;
+}
+
+body.dark-mode .navbar .account-menu, body.dark-mode nav .account-menu {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25) !important;
+}
+
+body.dark-mode .navbar .account-menu .menu-item, body.dark-mode nav .account-menu .menu-item {
+  color: #e4e6eb !important;
+}
+
+body.dark-mode .navbar .account-menu .menu-item.logout, body.dark-mode nav .account-menu .menu-item.logout {
+  color: #ff7675 !important;
+}
+
+body.dark-mode span[style*='background: #e6fff2'] {
+  background: #2ecc71 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .tab-active {
+  background: #23272f !important;
+  color: #ffd600 !important;
+  border-radius: 12px !important;
+}
+body.dark-mode .tab-active svg {
+  color: #ffd600 !important;
+}
+
+body.dark-mode .tabs {
+  background: #252a33 !important;
+  border-bottom: 2px solid #333 !important;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.tabs a, .tabs .tab, .tabs .tab-active {
+  color: #222 !important;
+}
+
+body.dark-mode .tabs a, body.dark-mode .tabs .tab, body.dark-mode .tabs .tab-active {
+  color: #ffd600 !important;
+}

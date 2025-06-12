@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+body.dark-mode, body.dark-mode .App, body.dark-mode .App-header {
+  background-color: #18191a !important;
+  color: #e4e6eb !important;
+}
+
+body.dark-mode .App-link {
+  color: #9aaff9 !important;
+}
