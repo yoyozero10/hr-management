@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getAllChamCong, modifyChamCong } from '../api/chamcongApi';
+import { getAllChamCong, modifyChamCong, checkIn, checkOut } from '../api/chamcongApi';
 import { getEmployees } from '../api/employeeApi';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const tableStyle = {
   width: '100%',
@@ -38,15 +40,38 @@ const ChamCongPage = () => {
   const [data, setData] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [filterDate, setFilterDate] = useState('');
   const [filterDept, setFilterDept] = useState('all');
   const [filterName, setFilterName] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
+    fetchUserInfo();
     fetchData();
   }, []);
+
+  const fetchUserInfo = async () => {
+    setUserLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${API_BASE_URL}/auth/api/auth/getcurrentUserInfor`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserInfo(response.data.data);
+    } catch (err) {
+      setUserInfo(null);
+    }
+    setUserLoading(false);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -102,53 +127,62 @@ const ChamCongPage = () => {
     return true;
   });
 
+  // Lấy employeeId từ userInfo
+  const employeeId = userInfo?.employeeId;
+  console.log('employees:', employees);
+  console.log('employeeId:', employeeId);
+  const employee = employees.find(emp => String(emp.id) === String(employeeId));
+  console.log('employee:', employee);
+  console.log('userInfo:', userInfo);
+  const today = new Date().toISOString().slice(0, 10);
+  console.log('today:', today);
+  console.log('data:', data);
+
+  // Lấy bản ghi chấm công hôm nay
+  const chamCong = data.find(row => (String(row.employeeId) === String(employeeId)) && row.ngay === today) || {};
+
+  // Xử lý check-in
+  const handleCheckIn = async () => {
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await checkIn({ token, employeeId });
+      fetchData();
+    } catch (e) {
+      alert('Check-in thất bại!');
+    }
+    setActionLoading(false);
+  };
+
+  // Xử lý check-out
+  const handleCheckOut = async () => {
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await checkOut({ token, employeeId });
+      fetchData();
+    } catch (e) {
+      alert('Check-out thất bại!');
+    }
+    setActionLoading(false);
+  };
+
+  if (userLoading) return <div>Đang tải thông tin người dùng...</div>;
+  if (!employeeId) return <div>Không tìm thấy employeeId của bạn!</div>;
+
   return (
     <div style={{ padding: 32 }}>
       <h2 style={{marginBottom: 0}}>Bảng chấm công</h2>
-      <div style={{color:'#888', marginBottom: 16}}>Dữ liệu chấm công ngày <b>05/06/2025</b></div>
-      <div style={{
-        background: '#fafbfc', borderRadius: 10, padding: 20, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 24
-      }}>
-        <div>
-          <div style={{fontWeight: 500, marginBottom: 4}}>Ngày</div>
-          <input
-            type="date"
-            value={filterDate}
-            onChange={e => setFilterDate(e.target.value)}
-            style={{padding: 8, borderRadius: 6, border: '1px solid #ccc'}}
-          />
+      {employee && (
+        <div style={{ marginBottom: 24 }}>
+          <div><b>Nhân viên:</b> {employee.hoten} ({employee.id})</div>
+          <div><b>Ngày:</b> {today}</div>
+          <div style={{ margin: '16px 0' }}>
+            <button onClick={handleCheckIn} disabled={!!chamCong.gioVao || actionLoading} style={{ marginRight: 12, padding: '8px 20px', borderRadius: 6, background: '#388e3c', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: chamCong.gioVao ? 'not-allowed' : 'pointer' }}>Check-in</button>
+            <button onClick={handleCheckOut} disabled={!chamCong.gioVao || !!chamCong.gioRa || actionLoading} style={{ padding: '8px 20px', borderRadius: 6, background: '#1976d2', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: (!chamCong.gioVao || chamCong.gioRa) ? 'not-allowed' : 'pointer' }}>Check-out</button>
+          </div>
         </div>
-        <div>
-          <div style={{fontWeight: 500, marginBottom: 4}}>Phòng ban</div>
-          <select
-            value={filterDept}
-            onChange={e => setFilterDept(e.target.value)}
-            style={{padding: 8, borderRadius: 6, border: '1px solid #ccc'}}
-          >
-            {departments.map(dep => (
-              <option key={dep.value} value={dep.value}>{dep.label}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <div style={{fontWeight: 500, marginBottom: 4}}>Tìm kiếm</div>
-          <input
-            type="text"
-            placeholder="Tên nhân viên..."
-            value={filterName}
-            onChange={e => setFilterName(e.target.value)}
-            style={{padding: 8, borderRadius: 6, border: '1px solid #ccc'}}
-          />
-        </div>
-        <button
-          style={{
-            background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginTop: 22
-          }}
-          onClick={() => {}} // Lọc realtime nên không cần làm gì
-        >
-          Áp dụng bộ lọc
-        </button>
-      </div>
+      )}
       {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={tableStyle}>
           <thead>
@@ -160,58 +194,20 @@ const ChamCongPage = () => {
               <th style={thStyle}>Số giờ làm</th>
               <th style={thStyle}>Loại công</th>
               <th style={thStyle}>Trạng thái</th>
-              <th style={thStyle}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {filteredEmployees.map((emp, idx) => {
-              const chamCong = findChamCong(emp.manv || emp.id) || {};
-              let workingHours =
-                chamCong.gioVao && chamCong.gioRa
-                  ? calcWorkingHours(chamCong.gioVao, chamCong.gioRa)
-                  : (chamCong.soGioLam || '-');
-              // Nếu là số giờ tính được, trừ đi 1h nghỉ ngơi (nếu lớn hơn 1h)
-              if (chamCong.gioVao && chamCong.gioRa && typeof workingHours === 'string' && workingHours.endsWith('h')) {
-                const num = parseFloat(workingHours);
-                if (!isNaN(num) && num > 1) {
-                  workingHours = (num - 1).toFixed(2) + 'h';
-                }
-              }
-              const status = getStatus(chamCong.gioVao, chamCong.gioRa);
-              return (
-                <tr key={emp.manv || emp.id || idx}>
-                  <td style={tdStyle}>{emp.manv || emp.id}</td>
-                  <td style={tdStyle}>{emp.hoten}</td>
-                  <td style={tdStyle}>{chamCong.gioVao || '-'}</td>
-                  <td style={tdStyle}>{chamCong.gioRa || '-'}</td>
-                  <td style={tdStyle}>{workingHours}</td>
-                  <td style={tdStyle}>{chamCong.loaicong || '-'}</td>
-                  <td style={{...tdStyle, padding: 0}}>
-                    <span style={badgeStyle(status.color, status.textColor)}>{status.label}</span>
-                  </td>
-                  <td style={tdStyle}>
-                    <button style={{
-                      border: '1px solid #ccc',
-                      borderRadius: 6,
-                      padding: '4px 12px',
-                      background: '#fff',
-                      cursor: 'pointer'
-                    }}
-                      onClick={() => {
-                        setEditData({
-                          ...chamCong,
-                          employee: emp,
-                          gioVao: chamCong.gioVao || '',
-                          gioRa: chamCong.gioRa || '',
-                          loaicong: chamCong.loaicong || ''
-                        });
-                        setEditOpen(true);
-                      }}
-                    >Chỉnh sửa</button>
-                  </td>
-                </tr>
-              );
-            })}
+            {employee ? (
+              <tr>
+                <td style={tdStyle}>{employee.id}</td>
+                <td style={tdStyle}>{employee.hoten}</td>
+                <td style={tdStyle}>{chamCong.gioVao || '-'}</td>
+                <td style={tdStyle}>{chamCong.gioRa || '-'}</td>
+                <td style={tdStyle}>{chamCong.soGioLam || '-'}</td>
+                <td style={tdStyle}>{chamCong.loaicong || '-'}</td>
+                <td style={tdStyle}>{chamCong.gioVao && !chamCong.gioRa ? 'Đang làm' : chamCong.gioVao && chamCong.gioRa ? 'Hoàn thành' : 'Chưa chấm công'}</td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       )}
@@ -224,7 +220,7 @@ const ChamCongPage = () => {
             background: '#fff', borderRadius: 10, padding: 32, minWidth: 350, boxShadow: '0 2px 16px rgba(0,0,0,0.15)'
           }}>
             <h3>Chỉnh sửa chấm công</h3>
-            <div style={{marginBottom: 12}}><b>{editData?.employee?.hoten}</b> ({editData?.employee?.manv})</div>
+            <div style={{marginBottom: 12}}><b>{editData?.employee?.hoten}</b> ({editData?.employee?.id})</div>
             <form onSubmit={async (e) => {
               e.preventDefault();
               // Đảm bảo đúng định dạng cho API

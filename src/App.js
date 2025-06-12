@@ -14,6 +14,7 @@ import PhongBanPage from './pages/PhongBanPage';
 import DanhGiaPage from './pages/DanhGiaPage';
 import BaoHiemPage from './pages/BaoHiemPage';
 import Switch from './components/ThemeToggle';
+import CurrentUserPage from './pages/CurrentUserPage';
 
 function AppContent() {
   const location = useLocation();
@@ -63,6 +64,11 @@ function AppContent() {
         <Route path="/baohiem" element={
           <PrivateRoute>
             <BaoHiemPage />
+          </PrivateRoute>
+        } />
+        <Route path="/thong-tin-ca-nhan" element={
+          <PrivateRoute>
+            <CurrentUserPage />
           </PrivateRoute>
         } />
       </Routes>

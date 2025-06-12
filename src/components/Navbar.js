@@ -8,6 +8,7 @@ import Switch from './ThemeToggle';
 const AccountMenu = ({ onLogout, username }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -48,7 +49,9 @@ const AccountMenu = ({ onLogout, username }) => {
             padding: '8px 0'
           }}
         >
-          <div style={{ padding: '12px 20px', fontWeight: 700, fontSize: 15, borderBottom: '1px solid #f0f0f0' }}>
+          <div style={{ padding: '12px 20px', fontWeight: 700, fontSize: 15, borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
+            onClick={() => { setOpen(false); navigate('/thong-tin-ca-nhan'); }}
+          >
             Tài khoản của tôi
             <div style={{ color: '#888', fontWeight: 400, fontSize: 13, marginTop: 2 }}>{username}</div>
           </div>
