@@ -7,13 +7,17 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
-// Lấy tất cả đánh giá (có thể lọc theo employeeId, ky, nam), gửi token cả body và header
-export const getAllDanhGia = (filter = {}) =>
-  axios.post(
-    `${API_URL}/getAll`,
-    { ...filter, token: getToken() },
-    { headers: { Authorization: `Bearer ${getToken()}` } }
+// Lấy tất cả đánh giá (sử dụng GET mới)
+export const getAllDanhGia = (params = {}) => {
+  const token = getToken();
+  return axios.get(
+    `${API_BASE_URL}/danhgianew/getAll`,
+    {
+      params,
+      headers: { Authorization: `Bearer ${token}` }
+    }
   );
+};
 
 // Thêm mới đánh giá
 export const addDanhGia = (data) => {
