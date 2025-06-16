@@ -102,10 +102,36 @@ const ChamCongPage = () => {
   // Tính số giờ làm
   const calcWorkingHours = (gioVao, gioRa) => {
     if (!gioVao || !gioRa) return '-';
-    const [h1, m1] = gioVao.split(':').map(Number);
-    const [h2, m2] = gioRa.split(':').map(Number);
-    const diff = (h2 + m2/60) - (h1 + m1/60);
-    return diff > 0 ? diff.toFixed(2) + 'h' : '-';
+    
+    // Chuyển đổi thời gian sang số giây
+    const getSeconds = (timeStr) => {
+      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+      return hours * 3600 + minutes * 60 + seconds;
+    };
+
+    const vaoSeconds = getSeconds(gioVao);
+    const raSeconds = getSeconds(gioRa);
+    
+    // Tính số giây làm việc
+    const diffSeconds = raSeconds - vaoSeconds;
+    
+    if (diffSeconds <= 0) return '-';
+    
+    // Chuyển đổi sang giờ:phút:giây
+    const hours = Math.floor(diffSeconds / 3600);
+    const minutes = Math.floor((diffSeconds % 3600) / 60);
+    const seconds = diffSeconds % 60;
+    
+    // Format kết quả
+    if (hours === 0 && minutes === 0) {
+      return `${seconds} giây`;
+    } else if (hours === 0) {
+      return `${minutes} phút${seconds > 0 ? ` ${seconds} giây` : ''}`;
+    } else if (minutes === 0) {
+      return `${hours} giờ${seconds > 0 ? ` ${seconds} giây` : ''}`;
+    } else {
+      return `${hours} giờ ${minutes} phút${seconds > 0 ? ` ${seconds} giây` : ''}`;
+    }
   };
 
   // Tính trạng thái
@@ -172,11 +198,17 @@ const ChamCongPage = () => {
 
   return (
     <div style={{ padding: 32 }}>
-      <h2 style={{marginBottom: 0}}>Bảng chấm công</h2>
+      <h1 style={{
+        fontSize: 32,
+        fontWeight: 700,
+        marginBottom: 24,
+        color: '#1a1a1a',
+        lineHeight: 1.2
+      }}>Bảng chấm công</h1>
       {employee && (
         <div style={{ marginBottom: 24 }}>
-          <div><b>Nhân viên:</b> {employee.hoten} ({employee.id})</div>
-          <div><b>Ngày:</b> {today}</div>
+          <div style={{ fontSize: 16 }}><b>Nhân viên:</b> {employee.hoten} ({employee.id})</div>
+          <div style={{ fontSize: 16 }}><b>Ngày:</b> {today}</div>
           <div style={{ margin: '16px 0' }}>
             <button onClick={handleCheckIn} disabled={!!chamCong.gioVao || actionLoading} style={{ marginRight: 12, padding: '8px 20px', borderRadius: 6, background: '#388e3c', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: chamCong.gioVao ? 'not-allowed' : 'pointer' }}>Check-in</button>
             <button onClick={handleCheckOut} disabled={!chamCong.gioVao || !!chamCong.gioRa || actionLoading} style={{ padding: '8px 20px', borderRadius: 6, background: '#1976d2', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: (!chamCong.gioVao || chamCong.gioRa) ? 'not-allowed' : 'pointer' }}>Check-out</button>
@@ -192,7 +224,6 @@ const ChamCongPage = () => {
               <th style={thStyle}>Giờ vào</th>
               <th style={thStyle}>Giờ ra</th>
               <th style={thStyle}>Số giờ làm</th>
-              <th style={thStyle}>Loại công</th>
               <th style={thStyle}>Trạng thái</th>
             </tr>
           </thead>
@@ -203,9 +234,25 @@ const ChamCongPage = () => {
                 <td style={tdStyle}>{employee.hoten}</td>
                 <td style={tdStyle}>{chamCong.gioVao || '-'}</td>
                 <td style={tdStyle}>{chamCong.gioRa || '-'}</td>
-                <td style={tdStyle}>{chamCong.soGioLam || '-'}</td>
-                <td style={tdStyle}>{chamCong.loaicong || '-'}</td>
-                <td style={tdStyle}>{chamCong.gioVao && !chamCong.gioRa ? 'Đang làm' : chamCong.gioVao && chamCong.gioRa ? 'Hoàn thành' : 'Chưa chấm công'}</td>
+                <td style={tdStyle}>{calcWorkingHours(chamCong.gioVao, chamCong.gioRa)}</td>
+                <td style={tdStyle}>
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: 12,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    ...(() => {
+                      if (!chamCong.gioVao) return { background: '#ffebee', color: '#d32f2f' };
+                      if (!chamCong.gioRa) return { background: '#e8f5e9', color: '#2e7d32' };
+                      return { background: '#e3f2fd', color: '#1976d2' };
+                    })()
+                  }}>
+                    {!chamCong.gioVao ? 'Chưa check-in' : 
+                     !chamCong.gioRa ? 'Đang làm việc' : 
+                     'Đã check-out'}
+                  </div>
+                </td>
               </tr>
             ) : null}
           </tbody>

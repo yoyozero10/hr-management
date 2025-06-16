@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Tabs from './components/Tabs';
 import DashboardPage from './pages/DashboardPage';
@@ -20,70 +20,88 @@ import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 function AppContent() {
   const location = useLocation();
   const hideNav = location.pathname === '/login' || location.pathname === '/register';
+
+  // Get user role from token
+  let roles = [];
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      roles = decoded.roles || [];
+    }
+  } catch (e) {}
+
+  const isUser = roles.includes('user');
+
   return (
-    <>
-      {!hideNav && <Navbar />}
-      {!hideNav && <Tabs />}
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        <Route path="/" element={
-          <PrivateRoute>
-            <DashboardPage />
-          </PrivateRoute>
-        } />
-        <Route path="/nhanvien" element={
-          <PrivateRoute>
-            <EmployeePage />
-          </PrivateRoute>
-        } />
-        <Route path="/chamcong" element={
-          <PrivateRoute>
-            <ChamCongPage />
-          </PrivateRoute>
-        } />
-        <Route path="/luong" element={
-          <PrivateRoute>
-            <LuongPage />
-          </PrivateRoute>
-        } />
-        <Route path="/tuyendung" element={
-          <PrivateRoute>
-            <TuyenDungPage />
-          </PrivateRoute>
-        } />
-        <Route path="/phongban" element={
-          <PrivateRoute>
-            <PhongBanPage />
-          </PrivateRoute>
-        } />
-        <Route path="/danhgia" element={
-          <PrivateRoute>
-            <DanhGiaPage />
-          </PrivateRoute>
-        } />
-        <Route path="/baohiem" element={
-          <PrivateRoute>
-            <BaoHiemPage />
-          </PrivateRoute>
-        } />
-        <Route path="/thong-tin-ca-nhan" element={
-          <PrivateRoute>
-            <CurrentUserPage />
-          </PrivateRoute>
-        } />
-      </Routes>
-    </>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      minHeight: '100vh',
+      background: '#f5f6fa'
+    }}>
+      {!hideNav && <Navbar showMenu={!isUser} />}
+      <div style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+          <Route path="/" element={
+            <PrivateRoute>
+              {isUser ? <Navigate to="/chamcong" replace /> : <DashboardPage />}
+            </PrivateRoute>
+          } />
+          <Route path="/nhanvien" element={
+            <PrivateRoute>
+              <EmployeePage />
+            </PrivateRoute>
+          } />
+          <Route path="/chamcong" element={
+            <PrivateRoute>
+              <ChamCongPage />
+            </PrivateRoute>
+          } />
+          <Route path="/luong" element={
+            <PrivateRoute>
+              <LuongPage />
+            </PrivateRoute>
+          } />
+          <Route path="/tuyendung" element={
+            <PrivateRoute>
+              <TuyenDungPage />
+            </PrivateRoute>
+          } />
+          <Route path="/phongban" element={
+            <PrivateRoute>
+              <PhongBanPage />
+            </PrivateRoute>
+          } />
+          <Route path="/danhgia" element={
+            <PrivateRoute>
+              <DanhGiaPage />
+            </PrivateRoute>
+          } />
+          <Route path="/baohiem" element={
+            <PrivateRoute>
+              <BaoHiemPage />
+            </PrivateRoute>
+          } />
+          <Route path="/thong-tin-ca-nhan" element={
+            <PrivateRoute>
+              <CurrentUserPage />
+            </PrivateRoute>
+          } />
+        </Routes>
+      </div>
+      {!hideNav && !isUser && <Tabs />}
+    </div>
   );
 }
 
-function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-}
+const App = () => (
+  <Router>
+    <AppContent />
+  </Router>
+);
 
 export default App;
