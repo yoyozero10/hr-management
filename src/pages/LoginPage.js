@@ -35,6 +35,7 @@ const LoginPage = () => {
         else if (payload.roles?.includes('ROLE_MANAGER')) appRole = 'manager';
         const user = { ...payload, role: appRole };
         localStorage.setItem('user', JSON.stringify(user));
+        console.log('PrivateRoute token:', token, 'user:', user);
         navigate('/');
       } else {
         setError('Đăng nhập thất bại!');
@@ -71,6 +72,62 @@ const LoginPage = () => {
           {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </button>
         {error && <div className="error-message">{error}</div>}
+        <button
+          type="button"
+          className="oauthButton"
+          style={{ background: '#fff', color: '#111', border: '1px solid #ccc', marginTop: 10 }}
+          onClick={() => {
+            const width = 500, height = 600;
+            const left = (window.innerWidth - width) / 2;
+            const top = (window.innerHeight - height) / 2;
+            console.log('Opening Google login popup...');
+            const popup = window.open(
+              'https://doanjava-api-692954731682.asia-southeast1.run.app/oauth2/authorization/google',
+              'GoogleLogin',
+              `width=${width},height=${height},left=${left},top=${top}`
+            );
+            console.log('Popup opened:', popup);
+            
+            window.addEventListener('message', (event) => {
+              console.log('Received message event:', event);
+              console.log('Event origin:', event.origin);
+              console.log('Window origin:', window.location.origin);
+              const allowedOrigins = [
+                window.location.origin,
+                'https://doanjava-api-692954731682.asia-southeast1.run.app'
+              ];
+              if (!allowedOrigins.includes(event.origin)) {
+                console.log('Origin not allowed, ignoring message');
+                return;
+              }
+              if (event.data.token) {
+                console.log('Received token from popup');
+                // Kiểm tra nếu token đến từ Google OAuth
+                if (event.data.type === 'google-auth-token') {
+                  localStorage.setItem('token', event.data.token);
+                  // Decode token để lấy thông tin user
+                  try {
+                    const payload = jwtDecode(event.data.token);
+                    let appRole = '';
+                    if (payload.roles?.includes('ROLE_ADMIN')) appRole = 'admin';
+                    else if (payload.roles?.includes('ROLE_USER')) appRole = 'user';
+                    else if (payload.roles?.includes('ROLE_MANAGER')) appRole = 'manager';
+                    const user = { ...payload, role: appRole };
+                    localStorage.setItem('user', JSON.stringify(user));
+                  } catch (error) {
+                    console.error('Error decoding token:', error);
+                  }
+                  window.location.href = '/';
+                }
+              } else {
+                console.log('No token in message data:', event.data);
+              }
+            }, { once: true });
+          }}
+        >
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Google" style={{ width: 20, marginRight: 8 }} />
+          Đăng nhập với Google
+        </button>
       </form>
     </StyledWrapper>
   );

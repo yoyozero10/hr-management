@@ -15,6 +15,7 @@ import DanhGiaPage from './pages/DanhGiaPage';
 import BaoHiemPage from './pages/BaoHiemPage';
 import Switch from './components/ThemeToggle';
 import CurrentUserPage from './pages/CurrentUserPage';
+import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 
 function AppContent() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function AppContent() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         <Route path="/" element={
           <PrivateRoute>
             <DashboardPage />
