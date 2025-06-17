@@ -202,7 +202,7 @@ const ChamCongPage = () => {
         fontSize: 32,
         fontWeight: 700,
         marginBottom: 24,
-        color: '#1a1a1a',
+        color: (document.body.classList && document.body.classList.contains('dark-mode')) ? '#fff' : '#1a1a1a',
         lineHeight: 1.2
       }}>Bảng chấm công</h1>
       {employee && (

@@ -84,7 +84,12 @@ const DanhGiaPage = () => {
       ]);
       console.log('API getAllDanhGia trả về:', evalRes.data);
       setEmployees(empRes.data.data || []);
-      setEvaluations((evalRes.data.data || []).map(ev => ({ ...ev })));
+      let allEvals = evalRes.data.data || [];
+      // Nếu là user, chỉ lấy đánh giá của bản thân
+      if (isUser && user?.employeeId) {
+        allEvals = allEvals.filter(ev => String(ev.employeeId) === String(user.employeeId));
+      }
+      setEvaluations(allEvals.map(ev => ({ ...ev })));
     } catch (e) {
       setAddError('Lỗi khi tải dữ liệu đánh giá hoặc nhân viên!');
     }
