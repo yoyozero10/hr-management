@@ -66,6 +66,10 @@ const DanhGiaPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [search, setSearch] = useState('');
 
+  // Lấy user hiện tại từ localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
+  const isUser = user?.role === 'user';
+
   useEffect(() => {
     fetchAll();
     fetchPhongbans();
@@ -124,6 +128,10 @@ const DanhGiaPage = () => {
   const getEmp = (id) => employees.find(emp => String(emp.id) === String(id)) || {};
 
   const filteredEvaluations = evaluations.filter(ev => {
+    if (isUser && user?.id) {
+      // Nếu là user thường, chỉ hiển thị đánh giá của chính mình
+      if (String(ev.employeeId) !== String(user.id)) return false;
+    }
     if (filterStatus !== 'all') {
       const level = getPerformanceLevel(ev.diemSo);
       if (filterStatus === 'Đạt' && level !== 'Tốt' && level !== 'Xuất sắc') return false;
@@ -182,6 +190,7 @@ const DanhGiaPage = () => {
           </select>
         </div>
         {/* Form thêm đánh giá */}
+        {!isUser && (
         <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}>
             <option value="">Chọn nhân viên</option>
@@ -197,6 +206,7 @@ const DanhGiaPage = () => {
           {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
           {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
         </form>
+        )}
         {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
           <thead>
@@ -212,11 +222,32 @@ const DanhGiaPage = () => {
           </thead>
           <tbody>
             {filteredEvaluations.map((ev, idx) => {
+              // Lấy thông tin nhân viên nếu có
+              let maNV = ev.nhanVien?.id || ev.employeeId || ev.id || 'Không có';
+              let hoTen = ev.nhanVien?.hoten || ev.hoten;
+              let phongBan = (() => {
+                if (ev.nhanVien?.idpb) {
+                  const pb = phongbans.find(p => String(p.id) === String(ev.nhanVien.idpb));
+                  return pb ? pb.tenpb || pb.name : ev.nhanVien.idpb;
+                }
+                return ev.phongban;
+              })();
+              // Nếu không có nhanVien, tìm trong employees
+              if (!hoTen || !phongBan) {
+                const emp = employees.find(emp => String(emp.id) === String(ev.employeeId || ev.id));
+                if (emp) {
+                  hoTen = hoTen || emp.hoten;
+                  phongBan = phongBan || emp.phongban;
+                }
+              }
+              maNV = maNV || 'Không có';
+              hoTen = hoTen || 'Không có';
+              phongBan = phongBan || 'Không có';
               return (
                 <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', verticalAlign: 'middle' }}>
-                  <td style={{ padding: '16px 8px' }}>{ev.nhanVien?.id || ''}</td>
-                  <td style={{ padding: '16px 8px' }}>{ev.nhanVien?.hoten || ''}</td>
-                  <td style={{ padding: '16px 8px' }}>{(() => { const pb = phongbans.find(p => String(p.id) === String(ev.nhanVien?.idpb)); return pb ? pb.tenpb || pb.name : ev.nhanVien?.idpb || ''; })()}</td>
+                  <td style={{ padding: '16px 8px' }}>{maNV}</td>
+                  <td style={{ padding: '16px 8px' }}>{hoTen}</td>
+                  <td style={{ padding: '16px 8px' }}>{phongBan}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.diemSo}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.nhanXet}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.ky}</td>
