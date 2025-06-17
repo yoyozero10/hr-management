@@ -41,6 +41,7 @@ function AppContent() {
       background: '#f5f6fa'
     }}>
       {!hideNav && <Navbar showMenu={!isUser} />}
+      {!hideNav && !isUser && <Tabs />}
       <div style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -93,7 +94,6 @@ function AppContent() {
           } />
         </Routes>
       </div>
-      {!hideNav && !isUser && <Tabs />}
     </div>
   );
 }

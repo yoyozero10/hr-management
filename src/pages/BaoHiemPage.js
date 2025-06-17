@@ -136,6 +136,7 @@ const BaoHiemPage = () => {
     setSearchError('');
     setSearchResult(null);
     try {
+      // Use the existing getBaoHiemById function from the API
       const res = await getBaoHiemById(searchId);
       setSearchResult(res.data.data);
       if (!res.data.data) setSearchError('Không tìm thấy bảo hiểm với ID này.');
@@ -153,7 +154,7 @@ const BaoHiemPage = () => {
       <form onSubmit={handleSearch} style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
         <input
           type="text"
-          placeholder="Tìm kiếm bảo hiểm theo ID..."
+          placeholder="Tìm kiếm bảo hiểm theo ID"
           value={searchId}
           onChange={e => setSearchId(e.target.value)}
           style={{
@@ -224,9 +225,7 @@ const BaoHiemPage = () => {
               <th style={thStyle}>Nơi khám bệnh</th>
               <th style={thStyle}>Mã NV</th>
               <th style={thStyle}>Họ tên NV</th>
-              <th style={thStyle}>Giới tính</th>
               <th style={thStyle}>Ngày sinh</th>
-              <th style={thStyle}>Điện thoại</th>
               <th style={thStyle}>Hành động</th>
             </tr>
           </thead>
@@ -240,9 +239,7 @@ const BaoHiemPage = () => {
                 <td style={tdStyle}>{row.noiKhamBenh}</td>
                 <td style={tdStyle}>{row.nhanVien?.id}</td>
                 <td style={tdStyle}>{row.nhanVien?.hoten}</td>
-                <td style={tdStyle}>{row.nhanVien?.gioitinh}</td>
                 <td style={tdStyle}>{row.nhanVien?.ngaysinh}</td>
-                <td style={tdStyle}>{row.nhanVien?.dienthoai}</td>
                 <td style={tdStyle}>
                   <button
                     style={{
