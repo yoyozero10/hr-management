@@ -65,15 +65,47 @@ const DanhGiaPage = () => {
   const [addSuccess, setAddSuccess] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [search, setSearch] = useState('');
-
-  // Lấy user hiện tại từ localStorage
-  const user = JSON.parse(localStorage.getItem('user'));
-  const isUser = user?.role === 'user';
+  const [employeeId, setEmployeeId] = useState(null);
+  const [isUser, setIsUser] = useState(false);
 
   useEffect(() => {
-    fetchAll();
-    fetchPhongbans();
+    // Ưu tiên lấy từ localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.role === 'user' && user.employeeId) {
+      setEmployeeId(user.employeeId);
+      setIsUser(true);
+    } else if (user && user.role === 'user' && user.id) {
+      setEmployeeId(user.id);
+      setIsUser(true);
+    } else if (user && user.role === 'user') {
+      // Nếu không có employeeId/id, lấy từ API
+      fetchEmployeeIdFromApi();
+      setIsUser(true);
+    }
   }, []);
+
+  const fetchEmployeeIdFromApi = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/auth/api/auth/getcurrentUserInfor`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data?.data?.employeeId) setEmployeeId(data.data.employeeId);
+      else if (data?.data?.id) setEmployeeId(data.data.id);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (isUser) {
+      if (employeeId) {
+        fetchAll();
+      }
+    } else {
+      fetchAll();
+    }
+    fetchPhongbans();
+  }, [employeeId, isUser]);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -85,9 +117,9 @@ const DanhGiaPage = () => {
       console.log('API getAllDanhGia trả về:', evalRes.data);
       setEmployees(empRes.data.data || []);
       let allEvals = evalRes.data.data || [];
-      // Nếu là user, chỉ lấy đánh giá của bản thân
-      if (isUser && user?.employeeId) {
-        allEvals = allEvals.filter(ev => String(ev.employeeId) === String(user.employeeId));
+      // Nếu là user, chỉ lấy đánh giá của bản thân (so sánh duy nhất với id)
+      if (isUser && employeeId) {
+        allEvals = allEvals.filter(ev => String(ev.id) === String(employeeId));
       }
       setEvaluations(allEvals.map(ev => ({ ...ev })));
     } catch (e) {
@@ -133,9 +165,9 @@ const DanhGiaPage = () => {
   const getEmp = (id) => employees.find(emp => String(emp.id) === String(id)) || {};
 
   const filteredEvaluations = evaluations.filter(ev => {
-    if (isUser && user?.id) {
-      // Nếu là user thường, chỉ hiển thị đánh giá của chính mình
-      if (String(ev.employeeId) !== String(user.id)) return false;
+    if (isUser && employeeId) {
+      // Nếu là user thường, chỉ hiển thị đánh giá của chính mình (so sánh duy nhất với id)
+      if (String(ev.id) !== String(employeeId)) return false;
     }
     if (filterStatus !== 'all') {
       const level = getPerformanceLevel(ev.diemSo);
@@ -196,21 +228,21 @@ const DanhGiaPage = () => {
         </div>
         {/* Form thêm đánh giá */}
         {!isUser && (
-        <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}>
-            <option value="">Chọn nhân viên</option>
-            {employees.map(emp => (
-              <option key={emp.id} value={emp.id}>{emp.hoten}{emp.phongban ? ` (${emp.phongban})` : ''}</option>
-            ))}
-          </select>
-          <input name="diemSo" value={form.diemSo} onChange={handleChange} placeholder="Điểm" type="number" step="0.1" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 100 }} />
-          <input name="nhanXet" value={form.nhanXet} onChange={handleChange} placeholder="Nhận xét" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
-          <input name="ky" value={form.ky} onChange={handleChange} placeholder="Kỳ" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
-          <input name="nam" value={form.nam} onChange={handleChange} placeholder="Năm" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
-          <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm đánh giá'}</button>
-          {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
-          {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
-        </form>
+          <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}>
+              <option value="">Chọn nhân viên</option>
+              {employees.map(emp => (
+                <option key={emp.id} value={emp.id}>{emp.hoten}{emp.phongban ? ` (${emp.phongban})` : ''}</option>
+              ))}
+            </select>
+            <input name="diemSo" value={form.diemSo} onChange={handleChange} placeholder="Điểm" type="number" step="0.1" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 100 }} />
+            <input name="nhanXet" value={form.nhanXet} onChange={handleChange} placeholder="Nhận xét" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
+            <input name="ky" value={form.ky} onChange={handleChange} placeholder="Kỳ" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
+            <input name="nam" value={form.nam} onChange={handleChange} placeholder="Năm" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
+            <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm đánh giá'}</button>
+            {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
+            {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
+          </form>
         )}
         {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>

@@ -1,324 +1,379 @@
 import React, { useEffect, useState } from 'react';
-import { getAllChamCong, modifyChamCong, checkIn, checkOut } from '../api/chamcongApi';
+import * as chamCongApi from '../api/chamcongApi';
 import { getEmployees } from '../api/employeeApi';
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
 
 const tableStyle = {
   width: '100%',
   borderCollapse: 'collapse',
-  marginTop: 16,
   background: '#fff',
-  borderRadius: 10,
-  boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-};
-const thStyle = {
-  background: '#fafbfc',
-  fontWeight: 700,
-  padding: '10px 12px',
-  borderBottom: '2px solid #eee',
-  textAlign: 'center',
-};
-const tdStyle = {
-  padding: '10px 12px',
-  borderBottom: '1px solid #f0f0f0',
-  textAlign: 'center',
+  borderRadius: 8,
+  overflow: 'hidden',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
 };
 
-const badgeStyle = (bg, color) => ({
-  display: 'inline-block',
-  padding: '4px 12px',
-  borderRadius: 12,
-  background: bg,
-  color: color,
-  fontWeight: 500,
-  fontSize: 13,
-  margin: 4
-});
+const thStyle = {
+  padding: '12px 16px',
+  textAlign: 'left',
+  backgroundColor: '#f5f5f5',
+  borderBottom: '2px solid #eee',
+  fontWeight: 600,
+  color: '#333'
+};
+
+const tdStyle = {
+  padding: '12px 16px',
+  borderBottom: '1px solid #eee',
+  color: '#444'
+};
+
+// Format thời gian
+const formatTime = (timeString) => {
+  if (!timeString) return '';
+  try {
+    const date = new Date(timeString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    
+    return date.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  } catch (e) {
+    console.error('Error formatting time:', e);
+    return 'Invalid Date';
+  }
+};
+
+// Format ngày
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    return date.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  } catch (e) {
+    console.error('Error formatting date:', e);
+    return dateString;
+  }
+};
+
+// Tính số giờ làm
+const calculateWorkHours = (gioVao, gioRa) => {
+  if (!gioVao || !gioRa) return 'N/A';
+  try {
+    const start = new Date(gioVao);
+    const end = new Date(gioRa);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return 'N/A';
+    }
+    const diff = end - start;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours} giờ ${minutes} phút`;
+  } catch (e) {
+    console.error('Error calculating work hours:', e);
+    return 'N/A';
+  }
+};
 
 const ChamCongPage = () => {
   const [data, setData] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState(null);
-  const [userLoading, setUserLoading] = useState(true);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editData, setEditData] = useState(null);
-  const [filterDate, setFilterDate] = useState('');
-  const [filterDept, setFilterDept] = useState('all');
-  const [filterName, setFilterName] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [employees, setEmployees] = useState([]);
+  const [employeeId, setEmployeeId] = useState(0);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  // Lấy thông tin user từ localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isUser = user?.role === 'user';
 
   useEffect(() => {
-    fetchUserInfo();
-    fetchData();
-  }, []);
-
-  const fetchUserInfo = async () => {
-    setUserLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_BASE_URL}/auth/api/auth/getcurrentUserInfor`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setUserInfo(response.data.data);
-    } catch (err) {
-      setUserInfo(null);
+    if (isUser && user?.employeeId) {
+      setEmployeeId(user.employeeId);
     }
-    setUserLoading(false);
-  };
+    fetchEmployees();
+    fetchData();
+  }, [isUser, user?.employeeId]);
 
   const fetchData = async () => {
     setLoading(true);
+    setError('');
     try {
-      const [chamCongRes, empRes] = await Promise.all([
-        getAllChamCong(),
-        getEmployees()
-      ]);
-      console.log('Dữ liệu chấm công trả về:', chamCongRes.data);
-      setData(chamCongRes.data.data || []);
-      setEmployees(empRes.data.data || []);
+      const params = {
+        ngay: startDate || new Date().toISOString().split('T')[0],
+        employeeId: employeeId || undefined
+      };
+      
+      const res = await chamCongApi.getAllChamCong(params);
+      let filteredData = res.data.data || [];
+      
+      // Nếu là user thường, chỉ hiển thị chấm công của bản thân
+      if (isUser && user?.employeeId) {
+        filteredData = filteredData.filter(item => 
+          String(item.employeeId) === String(user.employeeId)
+        );
+      }
+
+      // Filter by date range if endDate is specified
+      if (endDate) {
+        filteredData = filteredData.filter(item => {
+          const itemDate = new Date(item.ngay).setHours(0,0,0,0);
+          const end = new Date(endDate).setHours(0,0,0,0);
+          return itemDate <= end;
+        });
+      }
+      
+      // Map employee data
+      const mappedData = filteredData.map(item => {
+        const emp = employees.find(e => String(e.id) === String(item.employeeId));
+        return {
+          ...item,
+          employeeName: emp?.hoten || item.employeeName,
+          gioVao: formatTime(item.gioVao),
+          gioRa: formatTime(item.gioRa),
+          soGioLam: calculateWorkHours(item.gioVao, item.gioRa)
+        };
+      });
+      
+      setData(mappedData);
     } catch (e) {
-      alert('Lỗi khi lấy dữ liệu');
-      console.error(e);
+      console.error('Lỗi khi lấy dữ liệu chấm công:', e);
+      setError('Không thể tải dữ liệu chấm công. Vui lòng thử lại sau!');
     }
     setLoading(false);
   };
 
-  // Tìm bản ghi chấm công theo mã nhân viên và ngày lọc
-  const findChamCong = (manv) => {
-    return data.find(row => {
-      const matchId = row.employeeId === manv || row.employeeId === String(manv);
-      const matchDate = filterDate ? row.ngay === filterDate : true;
-      return matchId && matchDate;
-    });
-  };
-
-  // Tính số giờ làm
-  const calcWorkingHours = (gioVao, gioRa) => {
-    if (!gioVao || !gioRa) return '-';
-    
-    // Chuyển đổi thời gian sang số giây
-    const getSeconds = (timeStr) => {
-      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-      return hours * 3600 + minutes * 60 + seconds;
-    };
-
-    const vaoSeconds = getSeconds(gioVao);
-    const raSeconds = getSeconds(gioRa);
-    
-    // Tính số giây làm việc
-    const diffSeconds = raSeconds - vaoSeconds;
-    
-    if (diffSeconds <= 0) return '-';
-    
-    // Chuyển đổi sang giờ:phút:giây
-    const hours = Math.floor(diffSeconds / 3600);
-    const minutes = Math.floor((diffSeconds % 3600) / 60);
-    const seconds = diffSeconds % 60;
-    
-    // Format kết quả
-    if (hours === 0 && minutes === 0) {
-      return `${seconds} giây`;
-    } else if (hours === 0) {
-      return `${minutes} phút${seconds > 0 ? ` ${seconds} giây` : ''}`;
-    } else if (minutes === 0) {
-      return `${hours} giờ${seconds > 0 ? ` ${seconds} giây` : ''}`;
-    } else {
-      return `${hours} giờ ${minutes} phút${seconds > 0 ? ` ${seconds} giây` : ''}`;
-    }
-  };
-
-  // Tính trạng thái
-  const getStatus = (gioVao, gioRa) => {
-    if (!gioVao && !gioRa) return { label: 'Vắng mặt', color: '#f8d7da', textColor: '#d32f2f' };
-    if (gioVao > '08:30:00') return { label: 'Trễ', color: '#fff3cd', textColor: '#856404' };
-    if (gioRa > '17:30:00') return { label: 'Làm thêm', color: '#e3f2fd', textColor: '#1976d2' };
-    return { label: 'Đúng giờ', color: '#d4edda', textColor: '#388e3c' };
-  };
-
-  const uniqueDepartments = [
-    ...new Set(employees.map(emp => emp.phongban).filter(Boolean))
-  ];
-  const departments = [{ value: 'all', label: 'Tất cả phòng ban' }, ...uniqueDepartments.map(dep => ({ value: dep, label: dep }))];
-
-  const filteredEmployees = employees.filter(emp => {
-    if (filterDept !== 'all' && emp.phongban !== filterDept) return false;
-    if (filterName && !emp.hoten.toLowerCase().includes(filterName.toLowerCase())) return false;
-    return true;
-  });
-
-  // Lấy employeeId từ userInfo
-  const employeeId = userInfo?.employeeId;
-  console.log('employees:', employees);
-  console.log('employeeId:', employeeId);
-  const employee = employees.find(emp => String(emp.id) === String(employeeId));
-  console.log('employee:', employee);
-  console.log('userInfo:', userInfo);
-  const today = new Date().toISOString().slice(0, 10);
-  console.log('today:', today);
-  console.log('data:', data);
-
-  // Lấy bản ghi chấm công hôm nay
-  const chamCong = data.find(row => (String(row.employeeId) === String(employeeId)) && row.ngay === today) || {};
-
-  // Xử lý check-in
-  const handleCheckIn = async () => {
-    setActionLoading(true);
+  const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await checkIn({ token, employeeId });
-      fetchData();
+      const res = await getEmployees();
+      const empData = res.data.data || [];
+      setEmployees(empData);
+      
+      // Refresh data after getting employees to map names
+      if (data.length > 0) {
+        const mappedData = data.map(item => {
+          const emp = empData.find(e => String(e.id) === String(item.employeeId));
+          return {
+            ...item,
+            employeeName: emp?.hoten || item.employeeName
+          };
+        });
+        setData(mappedData);
+      }
     } catch (e) {
-      alert('Check-in thất bại!');
+      console.error('Lỗi khi lấy danh sách nhân viên:', e);
     }
-    setActionLoading(false);
   };
 
-  // Xử lý check-out
-  const handleCheckOut = async () => {
-    setActionLoading(true);
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
-      const token = localStorage.getItem('token');
-      await checkOut({ token, employeeId });
-      fetchData();
+      const res = await chamCongApi.getAllChamCong();
+      let filteredData = res.data.data || [];
+      
+      // Filter by employee ID
+      if (employeeId) {
+        filteredData = filteredData.filter(item => 
+          String(item.employeeId) === String(employeeId)
+        );
+      }
+
+      // Filter by date range
+      if (startDate) {
+        filteredData = filteredData.filter(item => {
+          const itemDate = new Date(item.ngay).setHours(0,0,0,0);
+          const start = new Date(startDate).setHours(0,0,0,0);
+          return itemDate >= start;
+        });
+      }
+
+      if (endDate) {
+        filteredData = filteredData.filter(item => {
+          const itemDate = new Date(item.ngay).setHours(0,0,0,0);
+          const end = new Date(endDate).setHours(0,0,0,0);
+          return itemDate <= end;
+        });
+      }
+      
+      // Nếu là user thường, chỉ hiển thị chấm công của bản thân
+      if (isUser && user?.employeeId) {
+        filteredData = filteredData.filter(item => 
+          String(item.employeeId) === String(user.employeeId)
+        );
+      }
+      
+      // Map employee data
+      const mappedData = filteredData.map(item => {
+        const emp = employees.find(e => String(e.id) === String(item.employeeId));
+        return {
+          ...item,
+          employeeName: emp?.hoten || item.employeeName
+        };
+      });
+      
+      setData(mappedData);
     } catch (e) {
-      alert('Check-out thất bại!');
+      console.error('Lỗi khi lọc dữ liệu chấm công:', e);
+      setError('Không thể lọc dữ liệu chấm công. Vui lòng thử lại sau!');
     }
-    setActionLoading(false);
+    setLoading(false);
   };
 
-  if (userLoading) return <div>Đang tải thông tin người dùng...</div>;
-  if (!employeeId) return <div>Không tìm thấy employeeId của bạn!</div>;
+  const handleClearFilters = () => {
+    if (!isUser) {
+      setEmployeeId(0);
+    }
+    setStartDate('');
+    setEndDate('');
+    fetchData();
+  };
 
   return (
     <div style={{ padding: 32 }}>
-      <h1 style={{
-        fontSize: 32,
-        fontWeight: 700,
-        marginBottom: 24,
-        color: (document.body.classList && document.body.classList.contains('dark-mode')) ? '#fff' : '#1a1a1a',
-        lineHeight: 1.2
-      }}>Bảng chấm công</h1>
-      {employee && (
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 16 }}><b>Nhân viên:</b> {employee.hoten} ({employee.id})</div>
-          <div style={{ fontSize: 16 }}><b>Ngày:</b> {today}</div>
-          <div style={{ margin: '16px 0' }}>
-            <button onClick={handleCheckIn} disabled={!!chamCong.gioVao || actionLoading} style={{ marginRight: 12, padding: '8px 20px', borderRadius: 6, background: '#388e3c', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: chamCong.gioVao ? 'not-allowed' : 'pointer' }}>Check-in</button>
-            <button onClick={handleCheckOut} disabled={!chamCong.gioVao || !!chamCong.gioRa || actionLoading} style={{ padding: '8px 20px', borderRadius: 6, background: '#1976d2', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: (!chamCong.gioVao || chamCong.gioRa) ? 'not-allowed' : 'pointer' }}>Check-out</button>
-          </div>
+      <h2>Bảng chấm công</h2>
+      
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
+        {!isUser && (
+          <select 
+            value={employeeId} 
+            onChange={e => setEmployeeId(Number(e.target.value))} 
+            style={{ padding: 8, borderRadius: 6 }}
+          >
+            <option value={0}>Tất cả nhân viên</option>
+            {employees.map(emp => (
+              <option key={emp.id} value={emp.id}>{emp.hoten}</option>
+            ))}
+          </select>
+        )}
+        
+        <input
+          type="date"
+          value={startDate}
+          onChange={e => setStartDate(e.target.value)}
+          style={{ padding: 8, borderRadius: 6 }}
+        />
+        
+        <input
+          type="date"
+          value={endDate}
+          onChange={e => setEndDate(e.target.value)}
+          style={{ padding: 8, borderRadius: 6 }}
+        />
+        
+        <button 
+          type="submit" 
+          disabled={loading}
+          style={{ 
+            background: '#111', 
+            color: '#fff', 
+            border: 'none', 
+            borderRadius: 6, 
+            padding: '8px 20px', 
+            fontWeight: 600, 
+            fontSize: 16, 
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1
+          }}
+        >
+          {loading ? 'Đang tải...' : 'Tìm kiếm'}
+        </button>
+        
+        <button 
+          type="button" 
+          onClick={handleClearFilters}
+          disabled={loading}
+          style={{ 
+            padding: '8px 20px', 
+            borderRadius: 6, 
+            background: '#eee', 
+            color: '#222', 
+            fontWeight: 600, 
+            fontSize: 16, 
+            border: 'none', 
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1
+          }}
+        >
+          Xóa lọc
+        </button>
+      </form>
+
+      {error && (
+        <div style={{ 
+          padding: '12px 16px', 
+          background: '#ffebee', 
+          color: '#c62828', 
+          borderRadius: 8, 
+          marginBottom: 16 
+        }}>
+          {error}
         </div>
       )}
-      {loading ? <div>Đang tải dữ liệu...</div> : (
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th style={thStyle}>Mã NV</th>
-              <th style={thStyle}>Họ tên</th>
-              <th style={thStyle}>Giờ vào</th>
-              <th style={thStyle}>Giờ ra</th>
-              <th style={thStyle}>Số giờ làm</th>
-              <th style={thStyle}>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employee ? (
-              <tr>
-                <td style={tdStyle}>{employee.id}</td>
-                <td style={tdStyle}>{employee.hoten}</td>
-                <td style={tdStyle}>{chamCong.gioVao || '-'}</td>
-                <td style={tdStyle}>{chamCong.gioRa || '-'}</td>
-                <td style={tdStyle}>{calcWorkingHours(chamCong.gioVao, chamCong.gioRa)}</td>
-                <td style={tdStyle}>
-                  <div style={{
-                    display: 'inline-block',
-                    padding: '4px 12px',
-                    borderRadius: 12,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    ...(() => {
-                      if (!chamCong.gioVao) return { background: '#ffebee', color: '#d32f2f' };
-                      if (!chamCong.gioRa) return { background: '#e8f5e9', color: '#2e7d32' };
-                      return { background: '#e3f2fd', color: '#1976d2' };
-                    })()
-                  }}>
-                    {!chamCong.gioVao ? 'Chưa check-in' : 
-                     !chamCong.gioRa ? 'Đang làm việc' : 
-                     'Đã check-out'}
-                  </div>
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      )}
-      {editOpen && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+      
+      {loading ? (
+        <div style={{ 
+          padding: '32px 0', 
+          textAlign: 'center', 
+          color: '#666' 
         }}>
-          <div style={{
-            background: '#fff', borderRadius: 10, padding: 32, minWidth: 350, boxShadow: '0 2px 16px rgba(0,0,0,0.15)'
-          }}>
-            <h3>Chỉnh sửa chấm công</h3>
-            <div style={{marginBottom: 12}}><b>{editData?.employee?.hoten}</b> ({editData?.employee?.id})</div>
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              // Đảm bảo đúng định dạng cho API
-              const token = localStorage.getItem('token');
-              const id = Number(editData.id);
-              const employeeId = Number(editData.employeeId);
-              // timeStamp: lấy từ editData.ngay hoặc editData.timeStamp, format yyyy-MM-dd
-              const timeStamp = (editData.ngay || editData.timeStamp || '').slice(0, 10);
-              // gioVao/gioRa: luôn có dạng HH:mm:ss
-              const gioVao = editData.gioVao && editData.gioVao.length === 5 ? editData.gioVao + ':00' : (editData.gioVao || '');
-              const gioRa = editData.gioRa && editData.gioRa.length === 5 ? editData.gioRa + ':00' : (editData.gioRa || '');
-              const body = {
-                token,
-                id,
-                employeeId,
-                timeStamp,
-                gioVao,
-                gioRa
-              };
-              try {
-                await modifyChamCong(body);
-                setEditOpen(false);
-                fetchData();
-              } catch (err) {
-                alert('Lỗi khi cập nhật!');
-              }
-            }}>
-              <div style={{marginBottom: 8}}>
-                <label>Giờ vào: </label>
-                <input
-                  type="time"
-                  value={editData?.gioVao ? editData.gioVao.slice(0,5) : ''}
-                  onChange={e => setEditData(ed => ({ ...ed, gioVao: e.target.value.length === 5 ? e.target.value + ':00' : e.target.value }))}
-                  required
-                />
-              </div>
-              <div style={{marginBottom: 8}}>
-                <label>Giờ ra: </label>
-                <input
-                  type="time"
-                  value={editData?.gioRa ? editData.gioRa.slice(0,5) : ''}
-                  onChange={e => setEditData(ed => ({ ...ed, gioRa: e.target.value.length === 5 ? e.target.value + ':00' : e.target.value }))}
-                  required
-                />
-              </div>
-              <div style={{marginTop: 16, textAlign: 'right'}}>
-                <button type="button" onClick={() => setEditOpen(false)} style={{marginRight: 8}}>Hủy</button>
-                <button type="submit">Lưu</button>
-              </div>
-            </form>
-          </div>
+          Đang tải dữ liệu...
+        </div>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Mã NV</th>
+                <th style={thStyle}>Họ tên</th>
+                <th style={thStyle}>Ngày</th>
+                <th style={thStyle}>Giờ vào</th>
+                <th style={thStyle}>Giờ ra</th>
+                <th style={thStyle}>Số giờ làm</th>
+                <th style={thStyle}>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ ...tdStyle, textAlign: 'center', padding: '32px 0', color: '#666' }}>
+                    Không có dữ liệu
+                  </td>
+                </tr>
+              ) : (
+                data.map((row, idx) => (
+                  <tr key={idx}>
+                    <td style={tdStyle}>{row.employeeId || ''}</td>
+                    <td style={tdStyle}>{row.employeeName || ''}</td>
+                    <td style={tdStyle}>{formatDate(row.ngay)}</td>
+                    <td style={tdStyle}>{row.gioVao || ''}</td>
+                    <td style={tdStyle}>{row.gioRa || ''}</td>
+                    <td style={tdStyle}>{row.soGioLam || ''}</td>
+                    <td style={tdStyle}>
+                      <span style={{
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        fontSize: 14,
+                        background: row.gioRa ? '#e8f5e9' : '#fff3e0',
+                        color: row.gioRa ? '#2e7d32' : '#ef6c00'
+                      }}>
+                        {row.gioRa ? 'Đã check-out' : 'Chưa check-out'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
