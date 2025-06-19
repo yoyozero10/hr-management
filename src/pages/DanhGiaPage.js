@@ -194,41 +194,12 @@ const DanhGiaPage = () => {
     }
   };
 
-  const handleSearch = async () => {
-    if (!searchId.trim()) {
-      fetchAll();
-      return;
-    }
-    
-    setSearchLoading(true);
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/danhgia/getByNhanVien/${searchId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (data.data) {
-        setEvaluations(data.data);
-      } else {
-        setEvaluations([]);
-      }
-    } catch (error) {
-      console.error('Lỗi khi tìm kiếm:', error);
-      setEvaluations([]);
-    }
-    setSearchLoading(false);
-  };
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSearch();
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchId]);
-
   const filteredEvaluations = evaluations
+    .filter(ev => {
+      if (!searchId.trim()) return true;
+      const maNV = String(ev.nhanVien?.id || ev.employeeId || ev.id || '').toLowerCase();
+      return maNV.includes(searchId.toLowerCase());
+    })
     .sort((a, b) => {
       if (sortOrder === 'none') return 0;
       const scoreA = parseFloat(a.diemSo) || 0;
