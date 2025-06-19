@@ -54,6 +54,16 @@ const getPieData = (evaluations) => {
   return PERFORMANCE_LABELS.map((label) => ({ name: label, value: counts[label] }));
 };
 
+const getStatusStyle = (diem) => {
+  const level = getPerformanceLevel(diem);
+  const levelIndex = PERFORMANCE_LABELS.indexOf(level);
+  const color = levelIndex >= 0 ? COLORS[levelIndex] : '#666666';
+  return {
+    bg: levelIndex >= 0 ? `${color}33` : '#f5f5f5', // 33 is 20% opacity in hex
+    color: levelIndex >= 0 ? color : '#666666'
+  };
+};
+
 const DanhGiaPage = () => {
   const [evaluations, setEvaluations] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -63,10 +73,11 @@ const DanhGiaPage = () => {
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [search, setSearch] = useState('');
+  const [searchId, setSearchId] = useState('');
   const [employeeId, setEmployeeId] = useState(null);
   const [isUser, setIsUser] = useState(false);
+  const [sortOrder, setSortOrder] = useState('none');
+  const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
     // Ưu tiên lấy từ localStorage
@@ -164,20 +175,66 @@ const DanhGiaPage = () => {
   // Map employeeId to hoten, phongban
   const getEmp = (id) => employees.find(emp => String(emp.id) === String(id)) || {};
 
-  const filteredEvaluations = evaluations.filter(ev => {
-    if (isUser && employeeId) {
-      // Nếu là user thường, chỉ hiển thị đánh giá của chính mình (so sánh duy nhất với id)
-      if (String(ev.id) !== String(employeeId)) return false;
+  const handleSortClick = () => {
+    setSortOrder(current => {
+      switch (current) {
+        case 'none': return 'asc';
+        case 'asc': return 'desc';
+        case 'desc': return 'none';
+        default: return 'none';
+      }
+    });
+  };
+
+  const getSortIcon = () => {
+    switch (sortOrder) {
+      case 'asc': return '↑';
+      case 'desc': return '↓';
+      default: return '↕';
     }
-    if (filterStatus !== 'all') {
-      const level = getPerformanceLevel(ev.diemSo);
-      if (filterStatus === 'Đạt' && level !== 'Tốt' && level !== 'Xuất sắc') return false;
-      if (filterStatus === 'Chưa đạt' && (level === 'Tốt' || level === 'Xuất sắc')) return false;
+  };
+
+  const handleSearch = async () => {
+    if (!searchId.trim()) {
+      fetchAll();
+      return;
     }
-    const emp = getEmp(ev.employeeId);
-    if (search && !(emp.hoten || '').toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+    
+    setSearchLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/danhgia/getByNhanVien/${searchId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.data) {
+        setEvaluations(data.data);
+      } else {
+        setEvaluations([]);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm:', error);
+      setEvaluations([]);
+    }
+    setSearchLoading(false);
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearch();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchId]);
+
+  const filteredEvaluations = evaluations
+    .sort((a, b) => {
+      if (sortOrder === 'none') return 0;
+      const scoreA = parseFloat(a.diemSo) || 0;
+      const scoreB = parseFloat(b.diemSo) || 0;
+      return sortOrder === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+    });
 
   const pieData = getPieData(evaluations);
 
@@ -208,24 +265,7 @@ const DanhGiaPage = () => {
       <div style={{ background: '#fff', borderRadius: 12, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <h2 style={{ margin: 0 }}>Bảng đánh giá nhân viên</h2>
         <div style={{ color: '#888', marginBottom: 24 }}>Tổng cộng {evaluations.length} đánh giá</div>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 220 }}
-          />
-          <select
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="Đạt">Đạt</option>
-            <option value="Chưa đạt">Chưa đạt</option>
-          </select>
-        </div>
+        
         {/* Form thêm đánh giá */}
         {!isUser && (
           <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -244,14 +284,76 @@ const DanhGiaPage = () => {
             {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
           </form>
         )}
+
+        {/* Search box */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ 
+            position: 'relative',
+            maxWidth: 220,
+            width: 'fit-content'
+          }}>
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã nhân viên"
+              value={searchId}
+              onChange={e => setSearchId(e.target.value)}
+              style={{ 
+                padding: '8px 32px',
+                borderRadius: 20,
+                border: '2px solid #eee',
+                width: '100%',
+                fontSize: '14px',
+                backgroundColor: '#f8f9fa',
+                transition: 'all 0.2s ease',
+                outline: 'none'
+              }}
+            />
+            <span style={{
+              position: 'absolute',
+              left: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              🔍
+            </span>
+            {searchLoading && (
+              <span style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#666',
+                fontSize: '14px'
+              }}>
+                ⌛
+              </span>
+            )}
+          </div>
+        </div>
+
         {loading ? <div>Đang tải dữ liệu...</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #f0f0f0', textAlign: 'left' }}>
-              <th style={{ padding: '12px 8px' }}>Mã NV</th>
+              <th style={{ padding: '12px 8px' }}>Mã nhân viên</th>
               <th style={{ padding: '12px 8px' }}>Họ tên</th>
               <th style={{ padding: '12px 8px' }}>Phòng ban</th>
-              <th style={{ padding: '12px 8px' }}>Điểm</th>
+              <th 
+                style={{ 
+                  padding: '12px 8px', 
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+                onClick={handleSortClick}
+              >
+                Điểm <span style={{ fontSize: '14px' }}>{getSortIcon()}</span>
+              </th>
+              <th style={{ padding: '12px 8px' }}>Trạng thái</th>
               <th style={{ padding: '12px 8px' }}>Nhận xét</th>
               <th style={{ padding: '12px 8px' }}>Kỳ</th>
               <th style={{ padding: '12px 8px' }}>Năm</th>
@@ -259,7 +361,6 @@ const DanhGiaPage = () => {
           </thead>
           <tbody>
             {filteredEvaluations.map((ev, idx) => {
-              // Lấy thông tin nhân viên nếu có
               let maNV = ev.nhanVien?.id || ev.employeeId || ev.id || 'Không có';
               let hoTen = ev.nhanVien?.hoten || ev.hoten;
               let phongBan = (() => {
@@ -269,7 +370,6 @@ const DanhGiaPage = () => {
                 }
                 return ev.phongban;
               })();
-              // Nếu không có nhanVien, tìm trong employees
               if (!hoTen || !phongBan) {
                 const emp = employees.find(emp => String(emp.id) === String(ev.employeeId || ev.id));
                 if (emp) {
@@ -280,12 +380,24 @@ const DanhGiaPage = () => {
               maNV = maNV || 'Không có';
               hoTen = hoTen || 'Không có';
               phongBan = phongBan || 'Không có';
+              const statusStyle = getStatusStyle(ev.diemSo);
               return (
                 <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', verticalAlign: 'middle' }}>
                   <td style={{ padding: '16px 8px' }}>{maNV}</td>
                   <td style={{ padding: '16px 8px' }}>{hoTen}</td>
                   <td style={{ padding: '16px 8px' }}>{phongBan}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.diemSo}</td>
+                  <td style={{ padding: '16px 8px' }}>
+                    <span style={{
+                      background: statusStyle.bg,
+                      color: statusStyle.color,
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontSize: '14px'
+                    }}>
+                      {getPerformanceLevel(ev.diemSo)}
+                    </span>
+                  </td>
                   <td style={{ padding: '16px 8px' }}>{ev.nhanXet}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.ky}</td>
                   <td style={{ padding: '16px 8px' }}>{ev.nam}</td>
