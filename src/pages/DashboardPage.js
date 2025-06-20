@@ -103,7 +103,9 @@ const DashboardPage = () => {
       const dgList = dgRes.data.data || [];
       if (dgList.length > 0) {
         const avg = dgList.reduce((sum, d) => sum + (d.diemSo || 0), 0) / dgList.length;
-        setAvgPerformance(avg.toFixed(1));
+        // Giả sử điểm đang ở thang 100, chuyển về thang 10
+        const avg10 = (avg / 10).toFixed(1);
+        setAvgPerformance(avg10);
       }
     } catch (e) {
       // Có thể thêm xử lý lỗi ở đây
