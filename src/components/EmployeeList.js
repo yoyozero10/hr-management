@@ -220,8 +220,22 @@ function EmployeeList({ onEdit, refresh }) {
             <tr key={emp.fid || emp.id || emp.manv}>
               <td style={tdStyle}>{emp.fid || emp.id || emp.manv || ''}</td>
               <td style={{...tdStyle, textAlign: 'left'}}>
-                <span style={avatarStyle}>{getInitials(emp.hoten)}</span>
-                {emp.hoten}
+                <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {emp.hinhanh ? (
+                    <img src={emp.hinhanh} alt={emp.hoten} style={{
+                      ...avatarStyle,
+                      objectFit: 'cover',
+                      background: '#fff',
+                      border: '2px solid #e3e9f7',
+                      width: 36,
+                      height: 36,
+                      marginRight: 8
+                    }} />
+                  ) : (
+                    <span style={avatarStyle}>{getInitials(emp.hoten)}</span>
+                  )}
+                  <span>{emp.hoten}</span>
+                </span>
               </td>
               <td style={tdStyle}>{emp.phongBan?.name || ''}</td>
               <td style={tdStyle}>{emp.chucVu?.name || ''}</td>

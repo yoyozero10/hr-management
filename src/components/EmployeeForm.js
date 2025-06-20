@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { addEmployee, updateEmployee } from '../api/employeeApi';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function EmployeeForm({ selected, onSuccess }) {
   const [form, setForm] = useState({
@@ -78,6 +80,31 @@ function EmployeeForm({ selected, onSuccess }) {
     });
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/cloudinary/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+        }
+      });
+      if (res.data && typeof res.data === 'string') {
+        setForm({ ...form, hinhanh: res.data });
+      } else if (res.data && res.data.url) {
+        setForm({ ...form, hinhanh: res.data.url });
+      } else if (typeof res.data === 'object') {
+        const url = Object.values(res.data)[0];
+        setForm({ ...form, hinhanh: url });
+      }
+    } catch (err) {
+      alert('Upload ảnh thất bại!');
+    }
+  };
+
   const inputStyle = {
     width: '100%',
     minWidth: 180,
@@ -150,6 +177,10 @@ function EmployeeForm({ selected, onSuccess }) {
         <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>Link ảnh (nếu có)</label>
           <input name="hinhanh" value={form.hinhanh} onChange={handleChange} style={inputStyle} />
+          <input type="file" accept="image/*" onChange={handleImageUpload} style={{ marginTop: 8 }} />
+          {form.hinhanh && (
+            <img src={form.hinhanh} alt="Preview" style={{ marginTop: 8, maxWidth: 120, maxHeight: 120, borderRadius: 8 }} />
+          )}
         </div>
         <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
           <label style={labelStyle}>ID phòng ban</label>
