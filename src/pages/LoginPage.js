@@ -46,89 +46,112 @@ const LoginPage = () => {
     setLoading(false);
   };
 
+  const handleGoogleLogin = () => {
+    const width = 500, height = 600;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+    console.log('Opening Google login popup...');
+    const popup = window.open(
+      'https://doanjava-api-692954731682.asia-southeast1.run.app/oauth2/authorization/google',
+      'GoogleLogin',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+    console.log('Popup opened:', popup);
+    
+    window.addEventListener('message', (event) => {
+      console.log('Received message event:', event);
+      console.log('Event origin:', event.origin);
+      console.log('Window origin:', window.location.origin);
+      const allowedOrigins = [
+        window.location.origin,
+        'https://doanjava-api-692954731682.asia-southeast1.run.app'
+      ];
+      if (!allowedOrigins.includes(event.origin)) {
+        console.log('Origin not allowed, ignoring message');
+        return;
+      }
+      if (event.data.token) {
+        console.log('Received token from popup');
+        // Kiểm tra nếu token đến từ Google OAuth
+        if (event.data.type === 'google-auth-token') {
+          localStorage.setItem('token', event.data.token);
+          // Decode token để lấy thông tin user
+          try {
+            const payload = jwtDecode(event.data.token);
+            let appRole = '';
+            if (payload.roles?.includes('ROLE_ADMIN')) appRole = 'admin';
+            else if (payload.roles?.includes('ROLE_USER')) appRole = 'user';
+            else if (payload.roles?.includes('ROLE_MANAGER')) appRole = 'manager';
+            const user = { ...payload, role: appRole };
+            localStorage.setItem('user', JSON.stringify(user));
+          } catch (error) {
+            console.error('Error decoding token:', error);
+          }
+          window.location.href = '/';
+        }
+      } else {
+        console.log('No token in message data:', event.data);
+      }
+    }, { once: true });
+  };
+
   return (
     <StyledWrapper>
-      <form className="form" onSubmit={handleSubmit}>
-        <p>
-          Welcome,<span>sign in to continue</span>
-        </p>
-        <input
-          type="text"
-          name="username"
-          placeholder="Tên đăng nhập"
-          value={form.username}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Mật khẩu"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button className="oauthButton" type="submit" disabled={loading}>
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-        </button>
-        {error && <div className="error-message">{error}</div>}
-        <button
-          type="button"
-          className="oauthButton"
-          style={{ background: '#fff', color: '#111', border: '1px solid #ccc', marginTop: 10 }}
-          onClick={() => {
-            const width = 500, height = 600;
-            const left = (window.innerWidth - width) / 2;
-            const top = (window.innerHeight - height) / 2;
-            console.log('Opening Google login popup...');
-            const popup = window.open(
-              'https://doanjava-api-692954731682.asia-southeast1.run.app/oauth2/authorization/google',
-              'GoogleLogin',
-              `width=${width},height=${height},left=${left},top=${top}`
-            );
-            console.log('Popup opened:', popup);
+      <LoginContainer>
+        <LogoSection>
+          <h1>HR Management</h1>
+          <p>Nền tảng quản lý nhân sự toàn diện</p>
+        </LogoSection>
+        <FormSection>
+          <FormCard>
+            <FormHeader>
+              <h2>Đăng nhập</h2>
+              <p>Vui lòng đăng nhập để tiếp tục</p>
+            </FormHeader>
             
-            window.addEventListener('message', (event) => {
-              console.log('Received message event:', event);
-              console.log('Event origin:', event.origin);
-              console.log('Window origin:', window.location.origin);
-              const allowedOrigins = [
-                window.location.origin,
-                'https://doanjava-api-692954731682.asia-southeast1.run.app'
-              ];
-              if (!allowedOrigins.includes(event.origin)) {
-                console.log('Origin not allowed, ignoring message');
-                return;
-              }
-              if (event.data.token) {
-                console.log('Received token from popup');
-                // Kiểm tra nếu token đến từ Google OAuth
-                if (event.data.type === 'google-auth-token') {
-                  localStorage.setItem('token', event.data.token);
-                  // Decode token để lấy thông tin user
-                  try {
-                    const payload = jwtDecode(event.data.token);
-                    let appRole = '';
-                    if (payload.roles?.includes('ROLE_ADMIN')) appRole = 'admin';
-                    else if (payload.roles?.includes('ROLE_USER')) appRole = 'user';
-                    else if (payload.roles?.includes('ROLE_MANAGER')) appRole = 'manager';
-                    const user = { ...payload, role: appRole };
-                    localStorage.setItem('user', JSON.stringify(user));
-                  } catch (error) {
-                    console.error('Error decoding token:', error);
-                  }
-                  window.location.href = '/';
-                }
-              } else {
-                console.log('No token in message data:', event.data);
-              }
-            }, { once: true });
-          }}
-        >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Google" style={{ width: 20, marginRight: 8 }} />
-          Đăng nhập với Google
-        </button>
-      </form>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            
+            <StyledForm onSubmit={handleSubmit}>
+              <FormGroup>
+                <label htmlFor="username">Tên đăng nhập</label>
+                <StyledInput
+                  id="username"
+                  type="text"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              
+              <FormGroup>
+                <label htmlFor="password">Mật khẩu</label>
+                <StyledInput
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              
+              <LoginButton type="submit" disabled={loading}>
+                {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+              </LoginButton>
+              
+              <Divider>
+                <span>hoặc</span>
+              </Divider>
+              
+              <GoogleButton type="button" onClick={handleGoogleLogin}>
+                <GoogleIcon src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/1880px-Google_Favicon_2025.svg.png" alt="Google" />
+                <span>Đăng nhập với Google</span>
+              </GoogleButton>
+            </StyledForm>
+          </FormCard>
+        </FormSection>
+      </LoginContainer>
     </StyledWrapper>
   );
 };
@@ -138,93 +161,207 @@ const StyledWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(120deg, #e3f0ff 0%, #f9f9f9 100%);
-  .form {
-    --background: #d3d3d3;
-    --input-focus: #2d8cf0;
-    --font-color: #323232;
-    --font-color-sub: #666;
-    --bg-color: #fff;
-    --main-color: #323232;
-    padding: 32px;
-    background: var(--background);
-    display: flex;
+  background: linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%, #ffffff 100%);
+`;
+
+const LoginContainer = styled.div`
+  display: flex;
+  width: 1000px;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 1024px) {
+    width: 90%;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 20px;
-    border-radius: 8px;
-    border: 2px solid var(--main-color);
-    box-shadow: 4px 4px var(--main-color);
-    min-width: 340px;
+    height: auto;
   }
-  .form > p {
-    color: var(--font-color);
-    font-weight: 700;
-    font-size: 20px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
+`;
+
+const LogoSection = styled.div`
+  flex: 1;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-  .form > p > span {
-    color: var(--font-color-sub);
-    font-weight: 600;
-    font-size: 17px;
+  
+  p {
+    font-size: 1.2rem;
+    text-align: center;
+    max-width: 80%;
+    opacity: 0.9;
   }
-  .form > input {
-    width: 250px;
-    height: 40px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--font-color);
-    padding: 5px 10px;
+  
+  @media (max-width: 1024px) {
+    padding: 30px;
+    
+    h1 {
+      font-size: 2rem;
+    }
+  }
+`;
+
+const FormSection = styled.div`
+  flex: 1;
+  background: white;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 1024px) {
+    padding: 20px;
+  }
+`;
+
+const FormCard = styled.div`
+  width: 100%;
+  max-width: 400px;
+`;
+
+const FormHeader = styled.div`
+  margin-bottom: 30px;
+  
+  h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #7f8c8d;
+    font-size: 1rem;
+  }
+`;
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #34495e;
+  }
+`;
+
+const StyledInput = styled.input`
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
     outline: none;
   }
-  .form > input:focus {
-    border-color: var(--input-focus);
+`;
+
+const LoginButton = styled.button`
+  height: 48px;
+  background: linear-gradient(to right, #3498db, #2980b9);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(to right, #2980b9, #2471a3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
   }
-  .oauthButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    width: 250px;
-    height: 40px;
-    border-radius: 6px;
-    border: none;
-    background: #111;
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    transition: all 250ms;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: none;
+  
+  &:active {
+    transform: translateY(0);
   }
-  .oauthButton:disabled {
+  
+  &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
-  .oauthButton::before {
-    display: none;
+`;
+
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  
+  &::before, &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
   }
-  .oauthButton:hover {
-    color: #fff;
-    background: #222;
+  
+  span {
+    padding: 0 10px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
   }
-  .error-message {
-    color: red;
-    text-align: center;
-    width: 100%;
-    font-size: 15px;
-    font-weight: 500;
+`;
+
+const GoogleButton = styled.button`
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
   }
+  
+  span {
+    margin-left: 8px;
+  }
+`;
+
+const GoogleIcon = styled.img`
+  width: 18px;
+  height: 18px;
+`;
+
+const ErrorMessage = styled.div`
+  background-color: #fee;
+  border-left: 4px solid #e74c3c;
+  color: #e74c3c;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
 `;
 
 export default LoginPage; 
