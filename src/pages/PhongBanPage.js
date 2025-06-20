@@ -85,12 +85,11 @@ const PhongBanPage = () => {
   return (
     <div style={{ padding: 32 }}>
       <h2>Danh sách phòng ban</h2>
-      <div style={{ marginBottom: 18 }}>
+      <div style={{ marginBottom: 18, display: 'flex', alignItems: 'center', gap: '32px', justifyContent: 'space-between' }}>
         <div style={{ 
           position: 'relative',
           maxWidth: 220,
-          width: 'fit-content',
-          marginBottom: 12
+          width: 'fit-content'
         }}>
           <input
             type="text"
@@ -130,24 +129,22 @@ const PhongBanPage = () => {
         </button>
       </div>
       {loading ? <div>Đang tải dữ liệu...</div> : (
-        <table style={{ width: '100%', background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
+        <table style={{ width: '100%', background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', tableLayout: 'fixed' }}>
           <thead>
             <tr>
-              <th style={{ padding: 12, textAlign: 'left' }}>Tên phòng ban</th>
-              <th style={{ padding: 12, textAlign: 'left' }}>Trưởng phòng</th>
-              <th style={{ padding: 12, textAlign: 'center' }}>Số nhân viên</th>
-              <th style={{ padding: 12, textAlign: 'center' }}>Thao tác</th>
+              <th style={{ padding: 12, textAlign: 'left', width: '30%' }}>Tên phòng ban</th>
+              <th style={{ padding: 12, textAlign: 'center', width: '60%' }}>Số nhân viên</th>
+              <th style={{ padding: 12, textAlign: 'center', width: '10%' }}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map(dep => (
               <tr key={dep.id}>
                 <td style={{ padding: 12 }}>{dep.name}</td>
-                <td style={{ padding: 12 }}>{dep.truongphong || '-'}</td>
                 <td style={{ padding: 12, textAlign: 'center' }}>{
                   employees.filter(emp => emp.phongBan && String(emp.phongBan.id) === String(dep.id)).length
                 }</td>
-                <td style={{ padding: 12, textAlign: 'center' }}>
+                <td style={{ padding: 12, textAlign: 'center', display: 'flex', justifyContent: 'center', gap: '8px' }}>
                   <button 
                     onClick={() => { 
                       setEditData({
@@ -164,7 +161,6 @@ const PhongBanPage = () => {
                       color: '#222',
                       fontSize: 20,
                       cursor: 'pointer',
-                      marginRight: 8,
                       padding: 4,
                       borderRadius: 6,
                       transition: 'background 0.2s',

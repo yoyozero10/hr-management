@@ -299,7 +299,7 @@ const ChamCongPage = () => {
           <table style={tableStyle}>
             <thead>
               <tr>
-                <th style={thStyle}>Mã NV</th>
+                <th style={thStyle}>Mã nhân viên</th>
                 <th style={thStyle}>Họ tên</th>
                 <th style={thStyle}>Ngày</th>
                 <th style={thStyle}>Giờ vào</th>

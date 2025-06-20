@@ -63,15 +63,27 @@ const topBar = {
   marginBottom: 18,
 };
 const searchInput = {
-  padding: '8px 14px 8px 32px',
-  border: '1px solid #e0e0e0',
-  borderRadius: 6,
-  fontSize: 15,
-  width: 300,
-  background: '#fafbfc',
-  backgroundImage: "url('data:image/svg+xml;utf8,<svg fill=\'%23999\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99c.41.41 1.09.41 1.5 0s.41-1.09 0-1.5l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z\'/></svg>')",
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: '8px center',
+  padding: '8px 32px',
+  borderRadius: 20,
+  border: '2px solid #eee',
+  width: '100%',
+  fontSize: '14px',
+  backgroundColor: '#f8f9fa',
+  transition: 'all 0.2s ease',
+  outline: 'none'
+};
+const searchIconStyle = {
+  position: 'absolute',
+  left: '10px',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  color: '#666',
+  fontSize: '14px'
+};
+const searchContainerStyle = {
+  position: 'relative',
+  maxWidth: 220,
+  width: 'fit-content'
 };
 const addBtn = {
   background: '#222',
@@ -165,7 +177,24 @@ function EmployeeList({ onEdit, refresh }) {
   // Lọc nhân viên theo tên
   const filtered = employees.filter(emp =>
     emp.hoten && emp.hoten.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    // Lấy mã nhân viên (ưu tiên manv, sau đó id, cuối cùng là fid)
+    const getEmployeeCode = (emp) => {
+      const code = emp.manv || emp.id || emp.fid || '';
+      // Nếu là số thì chuyển thành số để so sánh
+      return isNaN(code) ? code : Number(code);
+    };
+    
+    const codeA = getEmployeeCode(a);
+    const codeB = getEmployeeCode(b);
+    
+    // So sánh và sắp xếp từ nhỏ đến lớn
+    if (typeof codeA === 'number' && typeof codeB === 'number') {
+      return codeA - codeB;
+    }
+    // Nếu là chuỗi thì so sánh chuỗi
+    return String(codeA).localeCompare(String(codeB));
+  });
 
   const openAddModal = () => setModalEmployee({});
   const openEditModal = (emp) => setModalEmployee(emp);
@@ -190,12 +219,17 @@ function EmployeeList({ onEdit, refresh }) {
   return (
     <div style={tableWrapper}>
       <div style={topBar}>
-        <input
-          style={searchInput}
-          placeholder="Tìm kiếm nhân viên..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        <div style={searchContainerStyle}>
+          <input
+            style={searchInput}
+            placeholder="Tìm kiếm nhân viên"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <span style={searchIconStyle}>
+            🔍
+          </span>
+        </div>
         <button style={addBtn} onClick={openAddModal}>
           Thêm nhân viên
         </button>
