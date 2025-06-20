@@ -103,9 +103,7 @@ const DashboardPage = () => {
       const dgList = dgRes.data.data || [];
       if (dgList.length > 0) {
         const avg = dgList.reduce((sum, d) => sum + (d.diemSo || 0), 0) / dgList.length;
-        // Giả sử điểm đang ở thang 100, chuyển về thang 10
-        const avg10 = (avg / 10).toFixed(1);
-        setAvgPerformance(avg10);
+        setAvgPerformance(avg.toFixed(1));
       }
     } catch (e) {
       // Có thể thêm xử lý lỗi ở đây
@@ -158,7 +156,7 @@ const DashboardPage = () => {
         <Card title="Có mặt hôm nay" value={attendanceToday} icon={<MdAccessTime size={28} />} />
         <Card title="Tổng lương tháng" value={totalSalary.toLocaleString('vi-VN') + ' VNĐ'} icon={<MdAttachMoney size={28} />} />
         <Card title="Tuyển dụng mới" value={newRecruitments} icon={<MdPersonAdd size={28} />} />
-        <Card title="Hiệu suất trung bình" value={avgPerformance + '/10'} icon={<MdStar size={28} />} />
+        <Card title="Hiệu suất trung bình" value={avgPerformance + '/100'} icon={<MdStar size={28} />} />
         <Card title="Hôm nay" value={today} icon={<MdCalendarToday size={28} />} />
       </div>
       <div style={{ display: 'flex', gap: 24 }}>
