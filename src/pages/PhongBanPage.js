@@ -63,9 +63,8 @@ const PhongBanPage = () => {
       data = { name: editData.name };
     } else {
       data = {
-        name: editData.name,
-        truongphong: editData.truongphong,
-        soluongnv: Number(editData.soluongnv) || 0
+        idpb: parseInt(editData.idpb) || 0,
+        tenpb: editData.tenpb
       };
     }
     try {
@@ -77,7 +76,7 @@ const PhongBanPage = () => {
       setModalOpen(false);
       fetchDepartments();
     } catch (e) {
-      alert('Lỗi khi lưu phòng ban!');
+      alert('Lỗi khi lưu phòng ban: ' + (e.response?.data?.message || e.message));
     }
     setSaving(false);
   };
@@ -123,7 +122,7 @@ const PhongBanPage = () => {
             background: '#111', color: '#fff', border: 'none', borderRadius: 6,
             padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer'
           }}
-          onClick={() => { setEditData({ tenpb: '', truongphong: '', soluongnv: 0 }); setModalOpen(true); }}
+          onClick={() => { setEditData({ idpb: '', tenpb: '' }); setModalOpen(true); }}
         >
           Thêm phòng ban
         </button>
@@ -202,29 +201,24 @@ const PhongBanPage = () => {
             <h3>{editData.id ? 'Sửa phòng ban' : 'Thêm phòng ban'}</h3>
             <form onSubmit={handleSave}>
               <div style={{ marginBottom: 12 }}>
-                <label>Tên phòng ban:</label><br />
-                <input
-                  value={editData.name || ''}
-                  onChange={e => setEditData(ed => ({ ...ed, name: e.target.value }))}
-                  required
-                  style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }}
-                />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label>Trưởng phòng:</label><br />
-                <input
-                  value={editData.truongphong}
-                  onChange={e => setEditData(ed => ({ ...ed, truongphong: e.target.value }))}
-                  style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }}
-                />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label>Số nhân viên:</label><br />
+                <label>ID phòng ban:</label><br />
                 <input
                   type="number"
-                  value={editData.soluongnv}
-                  onChange={e => setEditData(ed => ({ ...ed, soluongnv: e.target.value }))}
-                  min={0}
+                  value={editData.idpb}
+                  onChange={e => setEditData(ed => ({ ...ed, idpb: e.target.value }))}
+                  required
+                  min="0"
+                  placeholder="Nhập ID phòng ban"
+                  style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }}
+                />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Tên phòng ban:</label><br />
+                <input
+                  value={editData.tenpb || ''}
+                  onChange={e => setEditData(ed => ({ ...ed, tenpb: e.target.value }))}
+                  required
+                  placeholder="Nhập tên phòng ban"
                   style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }}
                 />
               </div>
