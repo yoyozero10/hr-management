@@ -251,19 +251,6 @@ function EmployeeList({ onEdit, refresh }) {
                     marginRight: 12,
                     cursor: 'pointer'
                   }}
-                  title="Xem"
-                >
-                  &#128065;
-                </button>
-                <button
-                  style={{
-                    border: 'none',
-                    background: 'none',
-                    color: '#222',
-                    fontSize: 18,
-                    marginRight: 12,
-                    cursor: 'pointer'
-                  }}
                   title="Sửa"
                   onClick={() => openEditModal(emp)}
                 >

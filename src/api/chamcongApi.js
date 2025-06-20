@@ -29,13 +29,20 @@ function formatTime(time) {
 
 // Lấy tất cả dữ liệu chấm công
 export const getAllChamCong = (params = {}) => {
+  // Prepare request parameters
+  const requestParams = {
+    ngay: params.ngay || new Date().toISOString().split('T')[0]
+  };
+  
+  // Only add employId if it's defined and not 0
+  if (params.employeeId !== undefined && params.employeeId !== 0) {
+    requestParams.employId = params.employeeId;
+  }
+  
   return axios.get(
     `${API_URL}/getAll`,
     { 
-      params: {
-        ngay: params.ngay || new Date().toISOString().split('T')[0],
-        employeeId: params.employeeId
-      },
+      params: requestParams,
       headers: authHeaders() 
     }
   );

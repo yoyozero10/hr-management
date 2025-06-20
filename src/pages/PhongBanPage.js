@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllPhongBan, addPhongBan, updatePhongBan, deletePhongBan } from '../api/phongbanApi';
 import { getEmployees } from '../api/employeeApi';
+import { MdEdit, MdDelete } from 'react-icons/md';
 
 const PhongBanPage = () => {
   const [departments, setDepartments] = useState([]);
@@ -84,13 +85,40 @@ const PhongBanPage = () => {
   return (
     <div style={{ padding: 32 }}>
       <h2>Danh sách phòng ban</h2>
-      <div style={{ display: 'flex', marginBottom: 18, gap: 16 }}>
-        <input
-          placeholder="Tìm kiếm phòng ban..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 220 }}
-        />
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ 
+          position: 'relative',
+          maxWidth: 220,
+          width: 'fit-content',
+          marginBottom: 12
+        }}>
+          <input
+            type="text"
+            placeholder="Tìm kiếm phòng ban..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ 
+              padding: '8px 32px',
+              borderRadius: 20,
+              border: '2px solid #eee',
+              width: '100%',
+              fontSize: '14px',
+              backgroundColor: '#f8f9fa',
+              transition: 'all 0.2s ease',
+              outline: 'none'
+            }}
+          />
+          <span style={{
+            position: 'absolute',
+            left: '10px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#666',
+            fontSize: '14px'
+          }}>
+            🔍
+          </span>
+        </div>
         <button
           style={{
             background: '#111', color: '#fff', border: 'none', borderRadius: 6,
@@ -120,16 +148,47 @@ const PhongBanPage = () => {
                   employees.filter(emp => emp.phongBan && String(emp.phongBan.id) === String(dep.id)).length
                 }</td>
                 <td style={{ padding: 12, textAlign: 'center' }}>
-                  <button onClick={() => { 
-                    setEditData({
-                      id: dep.id,
-                      name: dep.name || '',
-                      truongphong: dep.truongphong || '',
-                      soluongnv: dep.soluongnv !== undefined ? dep.soluongnv : ''
-                    });
-                    setModalOpen(true); 
-                  }} style={{ marginRight: 8, border: '1px solid #ccc', borderRadius: 6, padding: '4px 12px', background: '#fff', color: '#222', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Sửa</button>
-                  <button onClick={() => handleDelete(dep.id)} style={{ color: '#e57373', border: '1px solid #ccc', borderRadius: 6, padding: '4px 12px', background: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Xóa</button>
+                  <button 
+                    onClick={() => { 
+                      setEditData({
+                        id: dep.id,
+                        name: dep.name || '',
+                        truongphong: dep.truongphong || '',
+                        soluongnv: dep.soluongnv !== undefined ? dep.soluongnv : ''
+                      });
+                      setModalOpen(true); 
+                    }} 
+                    style={{ 
+                      border: 'none',
+                      background: 'none',
+                      color: '#222',
+                      fontSize: 20,
+                      cursor: 'pointer',
+                      marginRight: 8,
+                      padding: 4,
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
+                    }}
+                    title="Sửa"
+                  >
+                    <MdEdit />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(dep.id)} 
+                    style={{ 
+                      border: 'none',
+                      background: 'none',
+                      color: '#e57373',
+                      fontSize: 20,
+                      cursor: 'pointer',
+                      padding: 4,
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
+                    }}
+                    title="Xóa"
+                  >
+                    <MdDelete />
+                  </button>
                 </td>
               </tr>
             ))}

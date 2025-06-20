@@ -161,7 +161,14 @@ const LuongPage = () => {
         };
       });
       
-      setData(mappedData);
+      // Sort by luongId/id in ascending order
+      const sortedData = mappedData.sort((a, b) => {
+        const idA = Number(a.luongId || a.id || 0);
+        const idB = Number(b.luongId || b.id || 0);
+        return idA - idB;
+      });
+      
+      setData(sortedData);
     } catch (e) {
       console.error('Lỗi khi lấy dữ liệu lương:', e);
       setError('Không thể tải dữ liệu lương. Vui lòng thử lại sau!');
@@ -184,7 +191,15 @@ const LuongPage = () => {
             employeeName: emp?.hoten || item.employeeName
           };
         });
-        setData(mappedData);
+        
+        // Sort by luongId/id in ascending order
+        const sortedData = mappedData.sort((a, b) => {
+          const idA = Number(a.luongId || a.id || 0);
+          const idB = Number(b.luongId || b.id || 0);
+          return idA - idB;
+        });
+        
+        setData(sortedData);
       }
     } catch (e) {
       console.error('Lỗi khi lấy danh sách nhân viên:', e);
