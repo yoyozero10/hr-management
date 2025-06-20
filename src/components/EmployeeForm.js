@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { addEmployee, updateEmployee } from '../api/employeeApi';
+import { getAllPhongBan } from '../api/phongbanApi';
+import { getAllTrinhDo } from '../api/trinhdoApi';
+import { getAllChucVu } from '../api/chucvuApi';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -17,6 +20,9 @@ function EmployeeForm({ selected, onSuccess }) {
     idcv: 0,
     idtd: 0,
   });
+  const [departments, setDepartments] = useState([]);
+  const [educationLevels, setEducationLevels] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     if (selected) setForm(selected);
@@ -34,6 +40,54 @@ function EmployeeForm({ selected, onSuccess }) {
       idtd: 0,
     });
   }, [selected]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await getAllPhongBan();
+        console.log('Department API Response:', response);
+        const departmentArray = response.data.data || [];
+        console.log('Processed Department Array:', departmentArray);
+        setDepartments(departmentArray);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+        setDepartments([]); // Set empty array on error
+      }
+    };
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    const fetchEducationLevels = async () => {
+      try {
+        const response = await getAllTrinhDo();
+        console.log('Education Level API Response:', response);
+        const educationArray = response.data.data || [];
+        console.log('Processed Education Level Array:', educationArray);
+        setEducationLevels(educationArray);
+      } catch (error) {
+        console.error('Error fetching education levels:', error);
+        setEducationLevels([]); // Set empty array on error
+      }
+    };
+    fetchEducationLevels();
+  }, []);
+
+  useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        const response = await getAllChucVu();
+        console.log('Position API Response:', response);
+        const positionArray = response.data.data || [];
+        console.log('Processed Position Array:', positionArray);
+        setPositions(positionArray);
+      } catch (error) {
+        console.error('Error fetching positions:', error);
+        setPositions([]); // Set empty array on error
+      }
+    };
+    fetchPositions();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -183,16 +237,31 @@ function EmployeeForm({ selected, onSuccess }) {
           )}
         </div>
         <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>ID phòng ban</label>
-          <input name="idpb" value={form.idpb} onChange={handleChange} type="number" required style={inputStyle} />
+          <label style={labelStyle}>Phòng ban</label>
+          <select name="idpb" value={form.idpb} onChange={handleChange} required style={inputStyle}>
+            <option value="0">Chọn phòng ban</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.id}>{dept.name}</option>
+            ))}
+          </select>
         </div>
         <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>ID chức vụ</label>
-          <input name="idcv" value={form.idcv} onChange={handleChange} type="number" required style={inputStyle} />
+          <label style={labelStyle}>Chức vụ</label>
+          <select name="idcv" value={form.idcv} onChange={handleChange} required style={inputStyle}>
+            <option value="0">Chọn chức vụ</option>
+            {positions.map(pos => (
+              <option key={pos.id} value={pos.id}>{pos.name}</option>
+            ))}
+          </select>
         </div>
         <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>ID trình độ</label>
-          <input name="idtd" value={form.idtd} onChange={handleChange} type="number" required style={inputStyle} />
+          <label style={labelStyle}>Trình độ</label>
+          <select name="idtd" value={form.idtd} onChange={handleChange} required style={inputStyle}>
+            <option value="0">Chọn trình độ</option>
+            {educationLevels.map(level => (
+              <option key={level.id} value={level.id}>{level.name}</option>
+            ))}
+          </select>
         </div>
       </div>
       <button type="submit" style={{
