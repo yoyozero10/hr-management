@@ -12,19 +12,15 @@ function authHeaders() {
 function formatTime(time) {
   if (!time) return null;
   try {
-    // If time is already in correct format, return as is
-    if (/^\d{2}:\d{2}:\d{2}$/.test(time)) return time;
+    // Nếu time đã đúng định dạng, trả về nguyên bản
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(time)) return time;
     
-    // If time is a date string, convert to HH:mm:ss
-    const date = new Date(time);
-    if (isNaN(date.getTime())) return null;
+    // Nếu là ISO string hoặc date string, lấy giờ:phút từ chuỗi
+    const timeStr = time.toString();
+    const match = timeStr.match(/\d{2}:\d{2}(:\d{2})?/);
+    if (match) return match[0];
     
-    return date.toLocaleTimeString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+    return null;
   } catch (e) {
     console.error('Error formatting time:', e);
     return null;
@@ -46,19 +42,19 @@ export const getAllChamCong = (params = {}) => {
 };
 
 // Check-in
-export const checkIn = (employeeId) => {
+export const checkIn = () => {
   return axios.post(
     `${API_URL}/checkIn`,
-    { employeeId },
+    null,
     { headers: authHeaders() }
   );
 };
 
 // Check-out
-export const checkOut = (employeeId) => {
+export const checkOut = () => {
   return axios.post(
     `${API_URL}/checkOut`,
-    { employeeId },
+    null,
     { headers: authHeaders() }
   );
 };

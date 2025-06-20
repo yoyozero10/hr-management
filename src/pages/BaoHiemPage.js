@@ -52,6 +52,32 @@ const BaoHiemPage = () => {
     fetchEmployees();
   }, []);
 
+  useEffect(() => {
+    const searchBaoHiem = async () => {
+      if (!searchId.trim()) {
+        setSearchResult(null);
+        setSearchError('');
+        return;
+      }
+      
+      setSearchLoading(true);
+      setSearchError('');
+      setSearchResult(null);
+      try {
+        const res = await getBaoHiemById(searchId);
+        setSearchResult(res.data.data);
+        if (!res.data.data) setSearchError('Không tìm thấy bảo hiểm với ID này.');
+      } catch (e) {
+        setSearchError('Không tìm thấy bảo hiểm với ID này.');
+        setSearchResult(null);
+      }
+      setSearchLoading(false);
+    };
+
+    const debounceTimeout = setTimeout(searchBaoHiem, 300);
+    return () => clearTimeout(debounceTimeout);
+  }, [searchId]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -130,61 +156,45 @@ const BaoHiemPage = () => {
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setSearchLoading(true);
-    setSearchError('');
-    setSearchResult(null);
-    try {
-      // Use the existing getBaoHiemById function from the API
-      const res = await getBaoHiemById(searchId);
-      setSearchResult(res.data.data);
-      if (!res.data.data) setSearchError('Không tìm thấy bảo hiểm với ID này.');
-    } catch (e) {
-      setSearchError('Không tìm thấy bảo hiểm với ID này.');
-      setSearchResult(null);
-    }
-    setSearchLoading(false);
-  };
-
   return (
     <div style={{ padding: 32 }}>
       <h2>Quản lý Bảo hiểm</h2>
       {/* Search box */}
-      <form onSubmit={handleSearch} style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <input
-          type="text"
-          placeholder="Tìm kiếm bảo hiểm theo ID"
-          value={searchId}
-          onChange={e => setSearchId(e.target.value)}
-          style={{
-            padding: '10px 28px',
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            minWidth: 180,
-            fontSize: 16,
-            fontWeight: 600,
-            background: '#fff',
-            boxShadow: '0 2px 8px rgba(41,98,255,0.02)'
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            background: '#111',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            padding: '8px 20px',
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: 'pointer',
-          }}
-        >
-          Tìm kiếm
-        </button>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ 
+          position: 'relative',
+          maxWidth: 220,
+          width: 'fit-content'
+        }}>
+          <input
+            type="text"
+            placeholder="Tìm kiếm bảo hiểm theo ID"
+            value={searchId}
+            onChange={e => setSearchId(e.target.value)}
+            style={{ 
+              padding: '8px 32px',
+              borderRadius: 20,
+              border: '2px solid #eee',
+              width: '100%',
+              fontSize: '14px',
+              backgroundColor: '#f8f9fa',
+              transition: 'all 0.2s ease',
+              outline: 'none'
+            }}
+          />
+          <span style={{
+            position: 'absolute',
+            left: '10px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#666',
+            fontSize: '14px'
+          }}>
+            🔍
+          </span>
+        </div>
         {searchLoading && <span style={{ marginLeft: 12 }}>Đang tìm...</span>}
-      </form>
+      </div>
       {searchError && <div style={{ color: 'red', marginBottom: 12 }}>{searchError}</div>}
       {searchResult && (
         <div style={{ background: '#f8fafd', borderRadius: 8, padding: 18, marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>

@@ -91,6 +91,11 @@ const TuyenDungPage = () => {
     setAdding(false);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+    setSearch(e.target.value); // Update search immediately when typing
+  };
+
   const filteredCandidates = candidates.filter(c => {
     if (search && !(c.hoten || c.name || '').toLowerCase().includes(search.toLowerCase())) return false;
     return true;
@@ -101,22 +106,6 @@ const TuyenDungPage = () => {
       <div style={{ background: '#fff', borderRadius: 12, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <h2 style={{ margin: 0 }}>Danh sách ứng viên</h2>
         <div style={{ color: '#888', marginBottom: 24 }}>Tổng cộng {candidates.length} ứng viên</div>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-          <input
-            type="text"
-            placeholder="Tìm kiếm ứng viên"
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-            style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 220 }}
-          />
-          <button
-            type="button"
-            style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
-            onClick={() => setSearch(searchInput)}
-          >
-            Tìm kiếm
-          </button>
-        </div>
         {/* Form thêm ứng viên */}
         <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <input name="hoten" value={form.hoten} onChange={handleChange} placeholder="Họ tên" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 160 }} />
@@ -128,6 +117,40 @@ const TuyenDungPage = () => {
           {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
           {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
         </form>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ 
+            position: 'relative',
+            maxWidth: 220,
+            width: 'fit-content'
+          }}>
+            <input
+              type="text"
+              placeholder="Tìm kiếm ứng viên"
+              value={searchInput}
+              onChange={handleSearchChange}
+              style={{ 
+                padding: '8px 32px',
+                borderRadius: 20,
+                border: '2px solid #eee',
+                width: '100%',
+                fontSize: '14px',
+                backgroundColor: '#f8f9fa',
+                transition: 'all 0.2s ease',
+                outline: 'none'
+              }}
+            />
+            <span style={{
+              position: 'absolute',
+              left: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              🔍
+            </span>
+          </div>
+        </div>
         {loading ? <div>Đang tải dữ liệu...</div> : error ? <div style={{color:'red'}}>{error}</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', tableLayout: 'fixed' }}>
           <thead>

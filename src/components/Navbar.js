@@ -98,6 +98,23 @@ const Navbar = ({ showMenu = true }) => {
     } catch (e) {}
   }
 
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isUser = user?.role === 'user';
+
+  const menuItems = isUser ? [
+    { path: '/thong-tin-ca-nhan', label: 'Thông tin cá nhân', icon: 'person' }
+  ] : [
+    { path: '/', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/employees', label: 'Nhân viên', icon: 'group' },
+    { path: '/chamcong', label: 'Chấm công', icon: 'access_time' },
+    { path: '/luong', label: 'Lương', icon: 'attach_money' },
+    { path: '/phongban', label: 'Phòng ban', icon: 'business' },
+    { path: '/baohiem', label: 'Bảo hiểm', icon: 'health_and_safety' },
+    { path: '/danhgia', label: 'Đánh giá', icon: 'grade' },
+    { path: '/tuyendung', label: 'Tuyển dụng', icon: 'person_add' },
+    { path: '/profile', label: 'Thông tin cá nhân', icon: 'person' },
+  ];
+
   return (
     <nav style={{ display: 'flex', alignItems: 'center', padding: '18px 32px', borderBottom: '1px solid #eee', background: '#fff', boxShadow: '0 2px 8px rgba(122,122,255,0.04)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

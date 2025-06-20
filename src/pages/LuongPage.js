@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPhieuLuong, getFilteredPhieuLuong, calculateSalary } from '../api/luongApi';
+import { getAllPhieuLuong, calculateSalary } from '../api/luongApi';
 import { getEmployees } from '../api/employeeApi';
 
 const tableStyle = {
@@ -191,43 +191,6 @@ const LuongPage = () => {
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const filter = {
-        employeeId: employeeId || undefined,
-        thang: thang || undefined,
-        nam: nam || undefined
-      };
-      const res = await getFilteredPhieuLuong(filter);
-      let filteredData = res.data.data || [];
-      
-      // Nếu là user thường, chỉ hiển thị lương của bản thân
-      if (isUser && user?.employeeId) {
-        filteredData = filteredData.filter(item => 
-          String(item.employeeId) === String(user.employeeId)
-        );
-      }
-      
-      // Map employee data
-      const mappedData = filteredData.map(item => {
-        const emp = employees.find(e => String(e.id) === String(item.employeeId));
-        return {
-          ...item,
-          employeeName: emp?.hoten || item.employeeName
-        };
-      });
-      
-      setData(mappedData);
-    } catch (e) {
-      console.error('Lỗi khi lọc dữ liệu lương:', e);
-      setError('Không thể lọc dữ liệu lương. Vui lòng thử lại sau!');
-    }
-    setLoading(false);
-  };
-
   const handleCalculate = async () => {
     if (!employeeId || !thang || !nam) {
       setError('Vui lòng chọn đầy đủ nhân viên, tháng và năm để tính lương!');
@@ -275,7 +238,7 @@ const LuongPage = () => {
     <div style={{ padding: 32 }}>
       <h2>Bảng lương</h2>
       
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
         {!isUser && (
           <select 
             value={employeeId} 
@@ -308,24 +271,6 @@ const LuongPage = () => {
           onChange={e => setNam(Number(e.target.value) || 0)}
           style={{ padding: 8, borderRadius: 6, width: 100 }}
         />
-        
-        <button 
-          type="submit" 
-          disabled={loading}
-          style={{ 
-            background: '#111', 
-            color: '#fff', 
-            border: 'none', 
-            borderRadius: 6, 
-            padding: '8px 20px', 
-            fontWeight: 600, 
-            fontSize: 16, 
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1
-          }}
-        >
-          {loading ? 'Đang tải...' : 'Tìm kiếm'}
-        </button>
 
         {!isUser && (
           <button 
@@ -366,7 +311,7 @@ const LuongPage = () => {
         >
           Xóa lọc
         </button>
-      </form>
+      </div>
 
       {error && (
         <div style={{ 

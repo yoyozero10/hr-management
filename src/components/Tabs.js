@@ -6,14 +6,15 @@ import {
 import { FaUserTie } from 'react-icons/fa';
 
 const tabs = [
-  { path: '/', label: 'Dashboard', icon: <MdDashboard />, roles: ['admin', 'manager', 'user'] },
+  { path: '/', label: 'Dashboard', icon: <MdDashboard />, roles: ['admin', 'manager'] },
   { path: '/phongban', label: 'Phòng ban', icon: <MdGroups />, roles: ['admin', 'manager'] },
   { path: '/nhanvien', label: 'Nhân viên', icon: <MdPerson />, roles: ['admin', 'manager'] },
-  { path: '/chamcong', label: 'Chấm công', icon: <MdAccessTime />, roles: ['admin', 'manager', 'user'] },
+  { path: '/chamcong', label: 'Chấm công', icon: <MdAccessTime />, roles: ['admin', 'manager'] },
+  { path: '/user-chamcong', label: 'Chấm công', icon: <MdAccessTime />, roles: ['user'] },
   { path: '/luong', label: 'Lương', icon: <MdAttachMoney />, roles: ['admin', 'manager'] },
   { path: '/baohiem', label: 'Bảo hiểm', icon: <MdSecurity />, roles: ['admin', 'manager'] },
   { path: '/tuyendung', label: 'Tuyển dụng', icon: <FaUserTie />, roles: ['admin', 'manager'] },
-  { path: '/danhgia', label: 'Đánh giá', icon: <MdStar />, roles: ['admin', 'manager', 'user'] },
+  { path: '/danhgia', label: 'Đánh giá', icon: <MdStar />, roles: ['admin', 'manager'] },
 ];
 
 const Tabs = () => {

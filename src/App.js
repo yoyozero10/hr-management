@@ -5,6 +5,7 @@ import Tabs from './components/Tabs';
 import DashboardPage from './pages/DashboardPage';
 import EmployeePage from './pages/EmployeePage';
 import ChamCongPage from './pages/ChamCongPage';
+import UserChamCongPage from './pages/UserChamCongPage';
 import LuongPage from './pages/LuongPage';
 import TuyenDungPage from './pages/TuyenDungPage';
 import LoginPage from './pages/LoginPage';
@@ -48,42 +49,47 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
           <Route path="/" element={
-            <PrivateRoute>
-              {isUser ? <Navigate to="/chamcong" replace /> : <DashboardPage />}
+            <PrivateRoute allowedRoles={['admin']}>
+              <DashboardPage />
             </PrivateRoute>
           } />
           <Route path="/nhanvien" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <EmployeePage />
             </PrivateRoute>
           } />
           <Route path="/chamcong" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <ChamCongPage />
             </PrivateRoute>
           } />
+          <Route path="/user-chamcong" element={
+            <PrivateRoute allowedRoles={['user']}>
+              <UserChamCongPage />
+            </PrivateRoute>
+          } />
           <Route path="/luong" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <LuongPage />
             </PrivateRoute>
           } />
           <Route path="/tuyendung" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <TuyenDungPage />
             </PrivateRoute>
           } />
           <Route path="/phongban" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <PhongBanPage />
             </PrivateRoute>
           } />
           <Route path="/danhgia" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <DanhGiaPage />
             </PrivateRoute>
           } />
           <Route path="/baohiem" element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['admin']}>
               <BaoHiemPage />
             </PrivateRoute>
           } />
