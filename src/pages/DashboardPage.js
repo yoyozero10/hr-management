@@ -5,6 +5,7 @@ import { getAllPhieuLuong } from '../api/luongApi';
 import { getAllDangXetDuyet } from '../api/tuyenDungApi';
 import { getAllDanhGia } from '../api/danhgiaApi';
 import { MdGroups, MdAccessTime, MdAttachMoney, MdPersonAdd, MdStar, MdCalendarToday } from 'react-icons/md';
+import { getCurrentMonthTotalSalary } from './LuongPage';
 
 const DashboardPage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -89,10 +90,11 @@ const DashboardPage = () => {
           }))
       );
 
-      // Tổng lương tháng
+      // Tổng lương tháng hiện tại
       const luongRes = await getAllPhieuLuong();
       const luongList = luongRes.data.data || [];
-      setTotalSalary(luongList.reduce((sum, p) => sum + (p.tongLuong || 0), 0));
+      const currentMonthSalary = getCurrentMonthTotalSalary(luongList);
+      setTotalSalary(currentMonthSalary);
 
       // Tuyển dụng mới
       const tdRes = await getAllDangXetDuyet();

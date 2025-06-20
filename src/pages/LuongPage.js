@@ -113,6 +113,17 @@ const formatCurrency = (value) => {
   }).format(value).replace('VND', '₫');
 };
 
+// Add this function before the LuongPage component
+export const getCurrentMonthTotalSalary = (salaryData) => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+  const currentYear = currentDate.getFullYear();
+
+  return salaryData
+    .filter(item => item.thang === currentMonth && item.nam === currentYear)
+    .reduce((total, item) => total + (Number(item.thuNhapThuc) || 0), 0);
+};
+
 const LuongPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
