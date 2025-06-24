@@ -162,7 +162,7 @@ function EmployeeForm({ selected, onSuccess }) {
   const inputStyle = {
     width: '100%',
     minWidth: 180,
-    maxWidth: 320,
+    maxWidth: 360,
     padding: '10px 16px',
     borderRadius: 8,
     border: '1px solid #ccc',
@@ -179,84 +179,124 @@ function EmployeeForm({ selected, onSuccess }) {
   return (
     <form onSubmit={handleSubmit} style={{
       marginBottom: 20,
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'grid',
+      gridTemplateColumns: '1fr',
       gap: 0,
-      background: '#fff',
-      borderRadius: 12,
-      padding: 32
+      background: '#f8fafc',
+      borderRadius: 16,
+      padding: 36,
+      boxShadow: '0 4px 24px rgba(41,98,255,0.08)',
+      maxWidth: 1100,
+      marginLeft: 'auto',
+      marginRight: 'auto',
     }}>
-      <div style={{ display: 'flex', gap: 40, marginBottom: 18 }}>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Họ tên</label>
-          <input name="hoten" value={form.hoten} onChange={handleChange} required style={inputStyle} />
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: 'repeat(4, auto)',
+        gap: 32,
+        marginBottom: 18
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Họ tên</label>
+          <input name="hoten" value={form.hoten} onChange={handleChange} required style={{ ...inputStyle, flex: 1 }} />
         </div>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Chức danh</label>
-          <input name="chucdanh" value={form.chucdanh} onChange={handleChange} required style={inputStyle} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Chức danh</label>
+          <input name="chucdanh" value={form.chucdanh} onChange={handleChange} required style={{ ...inputStyle, flex: 1 }} />
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: 40, marginBottom: 18 }}>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Giới tính</label>
-          <select name="gioitinh" value={form.gioitinh} onChange={handleChange} required style={inputStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Giới tính</label>
+          <select name="gioitinh" value={form.gioitinh} onChange={handleChange} required style={{ ...inputStyle, flex: 1, width: '100%', minWidth: 0, maxWidth: '100%', display: 'block' }}>
             <option value="">Giới tính</option>
             <option value="Nam">Nam</option>
             <option value="Nữ">Nữ</option>
             <option value="Khác">Khác</option>
           </select>
         </div>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Ngày sinh</label>
-          <input name="ngaysinh" value={form.ngaysinh} onChange={handleChange} type="date" required style={inputStyle} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Ngày sinh</label>
+          <input name="ngaysinh" value={form.ngaysinh} onChange={handleChange} type="date" required style={{ ...inputStyle, flex: 1 }} />
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: 40, marginBottom: 18 }}>
-        <div style={{ flex: 2, maxWidth: 600, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Địa chỉ</label>
-          <input name="diachi" value={form.diachi} onChange={handleChange} required style={inputStyle} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Địa chỉ</label>
+          <input name="diachi" value={form.diachi} onChange={handleChange} required style={{ ...inputStyle, flex: 1 }} />
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: 40, marginBottom: 18 }}>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Điện thoại</label>
-          <input name="dienthoai" value={form.dienthoai} onChange={handleChange} required style={inputStyle} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>CCCD</label>
+          <input name="cccd" value={form.cccd} onChange={handleChange} required style={{ ...inputStyle, flex: 1 }} />
         </div>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>CCCD</label>
-          <input name="cccd" value={form.cccd} onChange={handleChange} required style={inputStyle} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Điện thoại</label>
+          <input name="dienthoai" value={form.dienthoai} onChange={handleChange} required style={{ ...inputStyle, flex: 1 }} />
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: 40, marginBottom: 18 }}>
-        <div style={{ flex: 1, maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
-          <label style={labelStyle}>Link ảnh (nếu có)</label>
-          <input name="hinhanh" value={form.hinhanh} onChange={handleChange} style={inputStyle} />
-          <input type="file" accept="image/*" onChange={handleImageUpload} style={{ marginTop: 8 }} />
-          {form.hinhanh && (
-            <img src={form.hinhanh} alt="Preview" style={{ marginTop: 8, maxWidth: 120, maxHeight: 120, borderRadius: 8 }} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+          <label style={{ minWidth: 120, fontWeight: 500, marginRight: 18 }}>Link ảnh</label>
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1, gap: 10 }}>
+            <input name="hinhanh" value={form.hinhanh} onChange={handleChange} style={{ ...inputStyle, flex: 1 }} />
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ display: 'none' }}
+            />
+            <label htmlFor="file-upload" style={{
+              background: '#2962ff',
+              color: '#fff',
+              padding: '8px 20px',
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: 15,
+              cursor: 'pointer',
+              boxShadow: '0 1px 4px rgba(41,98,255,0.10)',
+              transition: 'background 0.2s',
+              display: 'inline-block',
+              marginTop: 0
+            }}
+              onMouseOver={e => e.currentTarget.style.background = '#0039cb'}
+              onMouseOut={e => e.currentTarget.style.background = '#2962ff'}
+            >
+              Chọn ảnh...
+            </label>
+            <span id="file-upload-name" style={{ fontSize: 15, color: '#333' }}>
+              {/* Hiển thị tên file nếu có */}
+              {form.hinhanh && !form.hinhanh.startsWith('http') && form.hinhanh}
+            </span>
+          </div>
+          {form.hinhanh && form.hinhanh.startsWith('http') && (
+            <img src={form.hinhanh} alt="Preview" style={{ marginTop: 8, maxWidth: 120, maxHeight: 120, borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }} />
           )}
         </div>
-        <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: 32,
+        marginBottom: 18,
+        marginTop: 8
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <label style={labelStyle}>Phòng ban</label>
-          <select name="idpb" value={form.idpb} onChange={handleChange} required style={inputStyle}>
+          <select name="idpb" value={form.idpb} onChange={handleChange} required style={{...inputStyle, minWidth: 120, maxWidth: '100%'}}>
             <option value="0">Chọn phòng ban</option>
             {departments.map(dept => (
               <option key={dept.id} value={dept.id}>{dept.name}</option>
             ))}
           </select>
         </div>
-        <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <label style={labelStyle}>Chức vụ</label>
-          <select name="idcv" value={form.idcv} onChange={handleChange} required style={inputStyle}>
+          <select name="idcv" value={form.idcv} onChange={handleChange} required style={{...inputStyle, minWidth: 120, maxWidth: '100%'}}>
             <option value="0">Chọn chức vụ</option>
             {positions.map(pos => (
               <option key={pos.id} value={pos.id}>{pos.name}</option>
             ))}
           </select>
         </div>
-        <div style={{ flex: 1, maxWidth: 200, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <label style={labelStyle}>Trình độ</label>
-          <select name="idtd" value={form.idtd} onChange={handleChange} required style={inputStyle}>
+          <select name="idtd" value={form.idtd} onChange={handleChange} required style={{...inputStyle, minWidth: 120, maxWidth: '100%'}}>
             <option value="0">Chọn trình độ</option>
             {educationLevels.map(level => (
               <option key={level.id} value={level.id}>{level.name}</option>
@@ -265,18 +305,22 @@ function EmployeeForm({ selected, onSuccess }) {
         </div>
       </div>
       <button type="submit" style={{
-        marginTop: 12,
+        marginTop: 24,
         background: '#2962ff',
         color: '#fff',
         border: 'none',
-        borderRadius: 8,
-        padding: '12px 32px',
-        fontWeight: 600,
-        fontSize: 16,
-        alignSelf: 'flex-end',
+        borderRadius: 10,
+        padding: '14px 40px',
+        fontWeight: 700,
+        fontSize: 17,
+        alignSelf: 'end',
         cursor: 'pointer',
-        boxShadow: '0 2px 8px rgba(41,98,255,0.08)'
-      }}>
+        boxShadow: '0 2px 8px rgba(41,98,255,0.10)',
+        transition: 'background 0.2s',
+      }}
+        onMouseOver={e => e.currentTarget.style.background = '#0039cb'}
+        onMouseOut={e => e.currentTarget.style.background = '#2962ff'}
+      >
         {selected ? 'Cập nhật' : 'Thêm mới'}
       </button>
     </form>
