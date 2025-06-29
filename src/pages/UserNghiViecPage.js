@@ -132,27 +132,20 @@ const UserNghiViecPage = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 16 }}>
               <thead>
                 <tr style={{ background: '#f0f4fa' }}>
-                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Từ ngày</th>
-                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Đến ngày</th>
-                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Lý do</th>
-                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Quyết định</th>
-                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Trạng thái</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Từ ngày</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Đến ngày</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Lý do</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Quyết định</th>
                 </tr>
               </thead>
               <tbody>
                 {requests.map((item, idx) => {
-                  const status = statusColor(item.quyetDinh);
                   return (
                     <tr key={item.id || idx}>
-                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.tungay}</td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.denngay}</td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.lyDo}</td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.quyetDinh || '-'}</td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>
-                        <span style={{ color: status.color, background: status.bg, padding: '4px 12px', borderRadius: 8, fontWeight: 600 }}>
-                          {status.text}
-                        </span>
-                      </td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.tungay}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.denngay}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.lyDo}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.quyetDinh || '-'}</td>
                     </tr>
                   );
                 })}
