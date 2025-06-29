@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addNghiViec, getAllNghiViec } from '../api/nghiviecApi';
+import { addNghiViec, getAllNghiViecByUser } from '../api/nghiviecApi';
 import { MdExitToApp } from 'react-icons/md';
 
 const statusColor = (status) => {
@@ -77,12 +77,9 @@ const UserNghiViecPage = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         let userId = user?.id || user?.userId;
         userId = parseInt(userId, 10);
-        console.log('Current user:', user, 'userId:', userId);
         if (!userId) throw new Error('Không tìm thấy userId');
-        const res = await getAllNghiViec();
-        // Lọc các đơn nghỉ việc của nhân viên hiện tại
-        const filtered = res.data.filter(item => String(item.manv) === String(userId));
-        setRequests(filtered);
+        const res = await getAllNghiViecByUser(userId);
+        setRequests(res.data);
       } catch (e) {
         setErrorRequests('Không tải được danh sách đơn nghỉ việc');
         console.error('Error fetching nghi viec:', e);
@@ -120,6 +117,49 @@ const UserNghiViecPage = () => {
         </form>
         {success && <div style={{ color: '#219653', marginTop: 18, fontWeight: 600, textAlign: 'center' }}>{success}</div>}
         {error && <div style={{ color: '#e53935', marginTop: 18, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
+      </div>
+      {/* Danh sách đơn nghỉ việc */}
+      <div style={{ ...cardStyle, marginTop: 24 }}>
+        <h3 style={{ color: '#1976d2', fontWeight: 700, marginBottom: 18, fontSize: 22 }}>Lịch sử đơn nghỉ việc</h3>
+        {loadingRequests ? (
+          <div>Đang tải...</div>
+        ) : errorRequests ? (
+          <div style={{ color: '#e53935' }}>{errorRequests}</div>
+        ) : requests.length === 0 ? (
+          <div>Chưa có đơn nghỉ việc nào.</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 16 }}>
+              <thead>
+                <tr style={{ background: '#f0f4fa' }}>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Từ ngày</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Đến ngày</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Lý do</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Quyết định</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0' }}>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((item, idx) => {
+                  const status = statusColor(item.quyetDinh);
+                  return (
+                    <tr key={item.id || idx}>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.tungay}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.denngay}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.lyDo}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>{item.quyetDinh || '-'}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0' }}>
+                        <span style={{ color: status.color, background: status.bg, padding: '4px 12px', borderRadius: 8, fontWeight: 600 }}>
+                          {status.text}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
