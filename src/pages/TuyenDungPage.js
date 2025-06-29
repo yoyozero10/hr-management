@@ -160,20 +160,21 @@ const TuyenDungPage = () => {
               <th style={{ padding: '12px 8px', width: '20%' }}>Vị trí</th>
               <th style={{ padding: '12px 8px', width: '30%' }}>Liên hệ</th>
               <th style={{ padding: '16px 12px', width: '15%'}}>Trạng thái</th>
+              <th style={{ padding: '16px 12px', width: '10%'}}>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {filteredCandidates.map((c, idx) => (
-              <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', verticalAlign: 'middle' }}>
-                <td style={{ padding: '16px 8px', display: 'flex', alignItems: 'center', gap: 12, width: '25%' }}>
+              <tr key={idx} style={{ borderBottom: '1px solid #f5f5f5', minHeight: 72 }}>
+                <td style={{ padding: '20px 8px', verticalAlign: 'middle', display: 'flex', alignItems: 'center', gap: 12, width: '25%' }}>
                   <span style={{ background: '#f2f4f8', color: '#222', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, flexShrink: 0 }}>{c.initials || (c.name ? c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : (c.hoten ? c.hoten.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3) : ''))}</span>
                   <div>
                     <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{c.name || c.hoten}</div>
                     <div style={{ color: '#888', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{c.dob || c.ngaysinh}</div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 8px', width: '20%' }}>{c.position || c.vitriungtuyen || c.vitri}</td>
-                <td style={{ padding: '16px 8px', width: '30%' }}>
+                <td style={{ padding: '20px 8px', verticalAlign: 'middle', width: '20%' }}>{c.position || c.vitriungtuyen || c.vitri}</td>
+                <td style={{ padding: '20px 8px', verticalAlign: 'middle', width: '30%' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span role="img" aria-label="phone">📞</span> {c.phone || c.sdt || c.dienthoai}
                   </div>
@@ -181,11 +182,13 @@ const TuyenDungPage = () => {
                     <span role="img" aria-label="email">✉️</span> {c.email}
                   </div>
                 </td>
-                <td style={{ padding: '16px 12px', width: '15%'}}>
+                <td style={{ padding: '20px 12px', verticalAlign: 'middle', width: '15%', textAlign: 'left' }}>
                   {statusBadge(getStatusType(c.status || c.trangthai), c.status || c.trangthai)}
+                </td>
+                <td style={{ padding: '20px 12px', verticalAlign: 'middle', width: '10%', textAlign: 'left' }}>
                   {getStatusType(c.status || c.trangthai) === 'pending' && (
                     <button
-                      style={{ marginLeft: 8, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#2962ff', color: '#fff', cursor: 'pointer', fontWeight: 500 }}
+                      style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
                       onClick={async () => {
                         try {
                           await acceptTuyenDung(c.id || c.candidateId);

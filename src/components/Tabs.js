@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  MdDashboard, MdGroups, MdPerson, MdAccessTime, MdAttachMoney, MdSecurity, MdStar 
+  MdDashboard, MdGroups, MdPerson, MdAccessTime, MdAttachMoney, MdSecurity, MdStar, MdExitToApp 
 } from 'react-icons/md';
 import { FaUserTie } from 'react-icons/fa';
 
@@ -11,8 +11,10 @@ const tabs = [
   { path: '/nhanvien', label: 'Nhân viên', icon: <MdPerson />, roles: ['admin', 'manager'] },
   { path: '/chamcong', label: 'Chấm công', icon: <MdAccessTime />, roles: ['admin', 'manager'] },
   { path: '/user-chamcong', label: 'Chấm công', icon: <MdAccessTime />, roles: ['user'] },
+  { path: '/user-nghiviec', label: 'Nghỉ việc', icon: <MdExitToApp />, roles: ['user'] },
   { path: '/luong', label: 'Lương', icon: <MdAttachMoney />, roles: ['admin', 'manager'] },
   { path: '/baohiem', label: 'Bảo hiểm', icon: <MdSecurity />, roles: ['admin', 'manager'] },
+  { path: '/nghiviec', label: 'Nghỉ việc', icon: <MdExitToApp />, roles: ['admin', 'manager'] },
   { path: '/tuyendung', label: 'Tuyển dụng', icon: <FaUserTie />, roles: ['admin', 'manager'] },
   { path: '/danhgia', label: 'Đánh giá', icon: <MdStar />, roles: ['admin', 'manager'] },
 ];
@@ -31,7 +33,9 @@ const Tabs = () => {
       marginBottom: 18,
       background: '#fff',
       alignItems: 'center',
-      minHeight: 56
+      minHeight: 56,
+      flexWrap: 'nowrap',
+      overflowX: 'auto'
     }}>
       {visibleTabs.map(tab => (
         <NavLink
@@ -51,7 +55,8 @@ const Tabs = () => {
             border: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: 8
+            gap: 8,
+            whiteSpace: 'nowrap'
           })}
           onMouseOver={e => {
             e.currentTarget.style.background = '#f5f5f5';

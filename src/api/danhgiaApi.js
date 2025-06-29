@@ -11,7 +11,7 @@ function getToken() {
 export const getAllDanhGia = (params = {}) => {
   const token = getToken();
   return axios.get(
-    `${API_BASE_URL}/danhgianew/getAll`,
+    `${API_URL}/getAll`,
     {
       params,
       headers: { Authorization: `Bearer ${token}` }

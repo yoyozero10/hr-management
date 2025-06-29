@@ -17,6 +17,8 @@ import BaoHiemPage from './pages/BaoHiemPage';
 import Switch from './components/ThemeToggle';
 import CurrentUserPage from './pages/CurrentUserPage';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
+import NghiViecPage from './pages/NghiViecPage';
+import UserNghiViecPage from './pages/UserNghiViecPage';
 
 function AppContent() {
   const location = useLocation();
@@ -96,6 +98,16 @@ function AppContent() {
           <Route path="/thong-tin-ca-nhan" element={
             <PrivateRoute>
               <CurrentUserPage />
+            </PrivateRoute>
+          } />
+          <Route path="/nghiviec" element={
+            <PrivateRoute allowedRoles={['admin', 'manager']}>
+              <NghiViecPage />
+            </PrivateRoute>
+          } />
+          <Route path="/user-nghiviec" element={
+            <PrivateRoute allowedRoles={['user']}>
+              <UserNghiViecPage />
             </PrivateRoute>
           } />
         </Routes>

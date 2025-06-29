@@ -64,6 +64,22 @@ const getStatusStyle = (diem) => {
   };
 };
 
+// Thêm hàm sắp xếp giống EmployeeList
+function sortEmployees(employees) {
+  return [...employees].sort((a, b) => {
+    const getEmployeeCode = (emp) => {
+      const code = emp.manv || emp.id || emp.fid || '';
+      return isNaN(code) ? code : Number(code);
+    };
+    const codeA = getEmployeeCode(a);
+    const codeB = getEmployeeCode(b);
+    if (typeof codeA === 'number' && typeof codeB === 'number') {
+      return codeA - codeB;
+    }
+    return String(codeA).localeCompare(String(codeB));
+  });
+}
+
 const DanhGiaPage = () => {
   const [evaluations, setEvaluations] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -154,16 +170,18 @@ const DanhGiaPage = () => {
     e.preventDefault();
     setAdding(true);
     setAddError('');
-    setAddSuccess('');
+    // Thêm log để kiểm tra giá trị gửi đi
+    console.log('Form submit:', form);
     try {
-      await addDanhGia({
+      const data = {
         employeeId: Number(form.employeeId),
         diemSo: Number(form.diemSo),
         nhanXet: form.nhanXet,
         ky: Number(form.ky),
         nam: Number(form.nam),
-      });
-      setAddSuccess('Thêm đánh giá thành công!');
+      };
+      console.log('Data gửi lên API:', data);
+      await addDanhGia(data);
       setForm(initialForm);
       fetchAll();
     } catch (e) {
@@ -245,19 +263,18 @@ const DanhGiaPage = () => {
         {/* Form thêm đánh giá */}
         {!isUser && (
           <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }}>
+            <select name="employeeId" value={form.employeeId} onChange={handleChange} required style={{ flex: 1, minWidth: 120, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}>
               <option value="">Chọn nhân viên</option>
-              {employees.map(emp => (
+              {sortEmployees(employees).map(emp => (
                 <option key={emp.id} value={emp.id}>{emp.hoten}{emp.phongban ? ` (${emp.phongban})` : ''}</option>
               ))}
             </select>
-            <input name="diemSo" value={form.diemSo} onChange={handleChange} placeholder="Điểm" type="number" step="0.1" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 100 }} />
-            <input name="nhanXet" value={form.nhanXet} onChange={handleChange} placeholder="Nhận xét" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
-            <input name="ky" value={form.ky} onChange={handleChange} placeholder="Kỳ" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
-            <input name="nam" value={form.nam} onChange={handleChange} placeholder="Năm" type="number" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 80 }} />
+            <input name="diemSo" value={form.diemSo} onChange={handleChange} placeholder="Điểm" type="number" step="0.1" required style={{ flex: 1, minWidth: 120, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} />
+            <input name="nhanXet" value={form.nhanXet} onChange={handleChange} placeholder="Nhận xét" required style={{ flex: 1, minWidth: 120, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} />
+            <input name="ky" value={form.ky} onChange={handleChange} placeholder="Kỳ" type="number" required style={{ flex: 1, minWidth: 120, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} />
+            <input name="nam" value={form.nam} onChange={handleChange} placeholder="Năm" type="number" required style={{ flex: 1, minWidth: 120, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} />
             <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm đánh giá'}</button>
             {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
-            {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
           </form>
         )}
 
