@@ -197,8 +197,13 @@ const DanhGiaPage = () => {
   const filteredEvaluations = evaluations
     .filter(ev => {
       if (!searchId.trim()) return true;
-      const maNV = String(ev.nhanVien?.id || ev.employeeId || ev.id || '').toLowerCase();
-      return maNV.includes(searchId.toLowerCase());
+      // Tìm kiếm theo tên nhân viên (họ tên)
+      let hoTen = ev.nhanVien?.hoten || ev.hoten;
+      if (!hoTen) {
+        const emp = employees.find(emp => String(emp.id) === String(ev.employeeId || ev.id));
+        hoTen = emp ? emp.hoten : '';
+      }
+      return hoTen.toLowerCase().includes(searchId.toLowerCase());
     })
     .sort((a, b) => {
       if (sortOrder === 'none') return 0;
@@ -265,7 +270,7 @@ const DanhGiaPage = () => {
           }}>
             <input
               type="text"
-              placeholder="Tìm kiếm theo mã nhân viên"
+              placeholder="Tìm kiếm theo tên nhân viên"
               value={searchId}
               onChange={e => setSearchId(e.target.value)}
               style={{ 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllDangXetDuyet, addNewTuyenDung } from '../api/tuyenDungApi';
+import { getAllDangXetDuyet, addNewTuyenDung, acceptTuyenDung } from '../api/tuyenDungApi';
 
 const statusBadge = (type, text) => {
   const map = {
@@ -107,15 +107,16 @@ const TuyenDungPage = () => {
         <h2 style={{ margin: 0 }}>Danh sách ứng viên</h2>
         <div style={{ color: '#888', marginBottom: 24 }}>Tổng cộng {candidates.length} ứng viên</div>
         {/* Form thêm ứng viên */}
-        <form onSubmit={handleAdd} style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <input name="hoten" value={form.hoten} onChange={handleChange} placeholder="Họ tên" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 160 }} />
-          <input name="ngaysinh" value={form.ngaysinh} onChange={handleChange} placeholder="Ngày sinh" type="date" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 140 }} />
-          <input name="dienthoai" value={form.dienthoai} onChange={handleChange} placeholder="Điện thoại" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 120 }} />
-          <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 180 }} />
-          <input name="vitri" value={form.vitri} onChange={handleChange} placeholder="Vị trí ứng tuyển" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', minWidth: 160 }} />
-          <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>{adding ? 'Đang thêm...' : 'Thêm ứng viên'}</button>
-          {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
-          {addSuccess && <span style={{ color: 'green', marginLeft: 12 }}>{addSuccess}</span>}
+        <form onSubmit={handleAdd} style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 32, marginBottom: 24, alignItems: 'flex-end', padding: '12px 0' }}>
+          <input name="hoten" value={form.hoten} onChange={handleChange} placeholder="Họ tên" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }} />
+          <input name="ngaysinh" value={form.ngaysinh} onChange={handleChange} placeholder="Ngày sinh" type="date" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }} />
+          <input name="dienthoai" value={form.dienthoai} onChange={handleChange} placeholder="Điện thoại" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }} />
+          <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }} />
+          <input name="vitri" value={form.vitri} onChange={handleChange} placeholder="Vị trí ứng tuyển" required style={{ padding: 8, borderRadius: 6, border: '1px solid #ccc', width: '100%' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button type="submit" disabled={adding} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: 'pointer', width: '100%' }}>{adding ? 'Đang thêm...' : 'Thêm ứng viên'}</button>
+            {addError && <span style={{ color: 'red', marginLeft: 12 }}>{addError}</span>}
+          </div>
         </form>
         <div style={{ marginBottom: 24 }}>
           <div style={{ 
@@ -182,6 +183,21 @@ const TuyenDungPage = () => {
                 </td>
                 <td style={{ padding: '16px 12px', width: '15%'}}>
                   {statusBadge(getStatusType(c.status || c.trangthai), c.status || c.trangthai)}
+                  {getStatusType(c.status || c.trangthai) === 'pending' && (
+                    <button
+                      style={{ marginLeft: 8, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#2962ff', color: '#fff', cursor: 'pointer', fontWeight: 500 }}
+                      onClick={async () => {
+                        try {
+                          await acceptTuyenDung(c.id || c.candidateId);
+                          fetchData();
+                        } catch (e) {
+                          alert('Lỗi khi duyệt ứng viên!');
+                        }
+                      }}
+                    >
+                      Duyệt
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

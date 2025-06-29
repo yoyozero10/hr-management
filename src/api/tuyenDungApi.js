@@ -25,10 +25,9 @@ export const getAllCandidatesByJobId = (jobId) => {
 // Lấy tất cả ứng viên đang xét duyệt
 export const getAllDangXetDuyet = () => {
   const token = getToken();
-  return axios.post(
+  return axios.get(
     `${API_URL}/getAll-DangXetDuyet`,
-    { token },
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: token ? `Bearer ${token}` : undefined } }
   );
 };
 
@@ -39,5 +38,15 @@ export const addNewTuyenDung = (data) => {
     `${API_URL}/addNewTuyenDung`,
     { ...data, token },
     { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
+
+// Duyệt ứng viên tuyển dụng
+export const acceptTuyenDung = (candidateId) => {
+  const token = getToken();
+  return axios.post(
+    `${API_URL}/accepttuyendung?candidateId=${candidateId}`,
+    {},
+    { headers: { Authorization: token ? `Bearer ${token}` : undefined } }
   );
 }; 

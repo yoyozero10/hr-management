@@ -7,6 +7,17 @@ import { getAllDanhGia } from '../api/danhgiaApi';
 import { MdGroups, MdAccessTime, MdAttachMoney, MdPersonAdd, MdStar, MdCalendarToday } from 'react-icons/md';
 import { getCurrentMonthTotalSalary } from './LuongPage';
 
+// Hàm định dạng giờ phút chung
+const formatTime = (timeStr) => {
+  if (!timeStr) return '';
+  // Nếu là dạng ISO hoặc HH:mm:ss(.SSS), chỉ lấy HH:mm
+  const parts = timeStr.split(":");
+  if (parts.length >= 2) {
+    return `${parts[0]}:${parts[1]}`;
+  }
+  return timeStr.slice(0,5);
+};
+
 const DashboardPage = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [chamCongData, setChamCongData] = useState(null);
@@ -85,7 +96,7 @@ const DashboardPage = () => {
           .filter(item => item.gioVao)
           .slice(-5)
           .map(item => ({
-            text: `Nhân viên ${item.employeeId} đã check-in lúc ${item.gioVao}`,
+            text: `Nhân viên ${item.employeeId} đã check-in lúc ${formatTime(item.gioVao)}`,
             time: item.gioVao
           }))
       );
@@ -134,8 +145,8 @@ const DashboardPage = () => {
           <h3 style={{ marginTop: 0 }}>Trạng thái chấm công</h3>
           {chamCongData ? (
             <>
-              <p><strong>Giờ vào:</strong> {chamCongData.gioVao || 'Chưa check-in'}</p>
-              <p><strong>Giờ ra:</strong> {chamCongData.gioRa || 'Chưa check-out'}</p>
+              <p><strong>Giờ vào:</strong> {chamCongData.gioVao ? formatTime(chamCongData.gioVao) : 'Chưa check-in'}</p>
+              <p><strong>Giờ ra:</strong> {chamCongData.gioRa ? formatTime(chamCongData.gioRa) : 'Chưa check-out'}</p>
               <p><strong>Trạng thái:</strong> {
                 !chamCongData.gioVao ? 'Chưa check-in' :
                 !chamCongData.gioRa ? 'Đang làm việc' :
