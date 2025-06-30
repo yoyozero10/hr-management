@@ -136,6 +136,7 @@ const UserNghiViecPage = () => {
                   <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Đến ngày</th>
                   <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Lý do</th>
                   <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Quyết định</th>
+                  <th style={{ padding: 10, borderBottom: '2px solid #e0e0e0', textAlign: 'center' }}>Lý do từ chối</th>
                 </tr>
               </thead>
               <tbody>
@@ -146,6 +147,7 @@ const UserNghiViecPage = () => {
                       <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.denngay}</td>
                       <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.lyDo}</td>
                       <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center' }}>{item.quyetDinh || '-'}</td>
+                      <td style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'center', color: '#e53935', fontStyle: 'italic' }}>{item.lido || ''}</td>
                     </tr>
                   );
                 })}

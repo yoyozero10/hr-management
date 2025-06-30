@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllNghiViec, approveNghiViec } from '../api/nghiviecApi';
+import { getAllNghiViec, approveNghiViec, rejectNghiViec } from '../api/nghiviecApi';
 
 const NghiViecPage = () => {
   const [data, setData] = useState([]);
@@ -7,6 +7,7 @@ const NghiViecPage = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [approvingId, setApprovingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
   const [searchName, setSearchName] = useState('');
 
   useEffect(() => {
@@ -38,6 +39,24 @@ const NghiViecPage = () => {
       setError('Duyệt đơn thất bại!');
     }
     setApprovingId(null);
+  };
+
+  const handleReject = async (id) => {
+    const reason = window.prompt('Nhập lý do không duyệt:');
+    if (!reason) return;
+    setRejectingId(id);
+    setSuccessMsg('');
+    setError('');
+    try {
+      await rejectNghiViec(id, reason);
+      setSuccessMsg('Đã cập nhật trạng thái không duyệt!');
+      // Refresh data
+      const res = await getAllNghiViec();
+      setData(res.data);
+    } catch (e) {
+      setError('Cập nhật trạng thái không duyệt thất bại!');
+    }
+    setRejectingId(null);
   };
 
   return (
@@ -84,6 +103,7 @@ const NghiViecPage = () => {
               <th style={{ padding: '12px 8px' }}>Lý do</th>
               <th style={{ padding: '12px 8px' }}>Quyết định</th>
               <th style={{ padding: '12px 8px' }}>Hành động</th>
+              <th style={{ padding: '12px 8px' }}>Lý do không duyệt</th>
             </tr>
           </thead>
           <tbody>
@@ -108,12 +128,12 @@ const NghiViecPage = () => {
                       borderRadius: 12,
                       fontWeight: 600,
                       color:
-                        item.quyetDinh?.toLowerCase().includes('đã duyệt') ? '#1a7f37' :
-                        item.quyetDinh?.toLowerCase().includes('đang xét') ? '#1976d2' :
+                        item.quyetDinh?.toLowerCase().includes('duyệt') ? '#1a7f37' :
+                        item.quyetDinh?.toLowerCase().includes('từ chối') ? '#d32f2f' :
                         '#888',
                       background:
-                        item.quyetDinh?.toLowerCase().includes('đã duyệt') ? '#d4f5e9' :
-                        item.quyetDinh?.toLowerCase().includes('đang xét') ? '#e3edfd' :
+                        item.quyetDinh?.toLowerCase().includes('duyệt') ? '#d4f5e9' :
+                        item.quyetDinh?.toLowerCase().includes('từ chối') ? '#fdeaea' :
                         '#f5f5f5',
                       fontSize: 14
                     }}
@@ -122,23 +142,48 @@ const NghiViecPage = () => {
                   </span>
                 </td>
                 <td style={{ padding: '10px 8px' }}>
-                  <button
-                    onClick={() => handleApprove(item.id)}
-                    disabled={approvingId === item.id}
-                    style={{
-                      background: '#111',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '8px 20px',
-                      fontWeight: 600,
-                      fontSize: 16,
-                      cursor: approvingId === item.id ? 'not-allowed' : 'pointer',
-                      opacity: approvingId === item.id ? 0.6 : 1
-                    }}
-                  >
-                    {approvingId === item.id ? 'Đang duyệt...' : 'Duyệt'}
-                  </button>
+                  {!((item.quyetDinh && (item.quyetDinh.trim().toLowerCase() === 'đã duyệt' || item.quyetDinh.trim().toLowerCase() === 'từ chối')) || item.lido) && (
+                    <>
+                      <button
+                        onClick={() => handleApprove(item.id)}
+                        disabled={approvingId === item.id}
+                        style={{
+                          background: '#111',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 20px',
+                          fontWeight: 600,
+                          fontSize: 16,
+                          cursor: approvingId === item.id ? 'not-allowed' : 'pointer',
+                          opacity: approvingId === item.id ? 0.6 : 1,
+                          marginRight: 8
+                        }}
+                      >
+                        {approvingId === item.id ? 'Đang duyệt...' : 'Duyệt'}
+                      </button>
+                      <button
+                        onClick={() => handleReject(item.id)}
+                        disabled={rejectingId === item.id}
+                        style={{
+                          background: '#111',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 20px',
+                          fontWeight: 600,
+                          fontSize: 16,
+                          cursor: rejectingId === item.id ? 'not-allowed' : 'pointer',
+                          opacity: rejectingId === item.id ? 0.6 : 1
+                        }}
+                      >
+                        {rejectingId === item.id ? 'Đang gửi...' : 'Không duyệt'}
+                      </button>
+                    </>
+                  )}
+                </td>
+                <td style={{ padding: '10px 8px', color: '#d32f2f', fontStyle: 'italic' }}>
+                  {item.lido || ''}
                 </td>
               </tr>
             ))}

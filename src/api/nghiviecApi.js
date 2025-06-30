@@ -18,7 +18,22 @@ export const getAllNghiViec = () =>
   axios.get(`${API_URL}/getall`, { headers: authHeaders() });
 
 export const approveNghiViec = (nghiViecId) =>
-  axios.post(`${API_URL}/approve`, null, {
-    params: { nghiViecId },
-    headers: authHeaders()
-  }); 
+  axios.post(
+    `${API_URL}/approve`,
+    null,
+    {
+      params: { nghiViecId },
+      headers: authHeaders()
+    }
+  );
+
+export const rejectNghiViec = (nghiViecId, lido) => {
+  return axios.post(
+    `${API_BASE_URL}/nghiviec/decline`,
+    null,
+    {
+      params: { nghiViecId, lido },
+      headers: authHeaders()
+    }
+  );
+}; 
